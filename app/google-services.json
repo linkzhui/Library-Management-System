@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "734973382605",
+    "firebase_url": "https://university-library-manag-fc8c7.firebaseio.com",
+    "project_id": "university-library-manag-fc8c7",
+    "storage_bucket": "university-library-manag-fc8c7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:734973382605:android:f1b6f0e9d986a889",
+        "android_client_info": {
+          "package_name": "com.example.raymon.universitylibraryassistance"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "734973382605-spa5hfql8il7frevbdf3l23q2pnqjv8e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.raymon.universitylibraryassistance",
+            "certificate_hash": "8798f1d9c12046fc73011c5e4f0c257afb35dcb1"
+          }
+        },
+        {
+          "client_id": "734973382605-in74kj5pbkkhu55bkifjlppbe004tas4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbdBzLSFa27XqmF4_3ali0gZQNvhmfU0E"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "734973382605-in74kj5pbkkhu55bkifjlppbe004tas4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
