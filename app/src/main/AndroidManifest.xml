@@ -18,7 +18,8 @@
         </activity>
         <activity android:name=".LibrarianActivity" />
         <activity android:name=".PatronActivity" />
-        <activity android:name=".SearchActivity"></activity>
+        <activity android:name=".BookManagementActivity" />
+        <activity android:name=".BookSearchActivity"></activity>
     </application>
 
 </manifest>

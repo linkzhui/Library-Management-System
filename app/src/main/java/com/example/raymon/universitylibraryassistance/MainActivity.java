@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         mUniversityField = findViewById(R.id.editTextUniversityID);
         mRegistrationButton = findViewById(R.id.Register);
         mLoginButton = findViewById(R.id.Login);
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+
         Log.e("Life cycle test", "We are at onCreate()");
         mRegistrationButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,33 +82,16 @@ public class MainActivity extends AppCompatActivity {
         if (!validateForm(false)) {
             return;
         }
-        final String email_address = mEmailField.getText().toString();
-        final String university_ID = mUniversityField.getText().toString();
-
         // [START create_user_with_email]
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-
                             // Sign in success, update UI with the signed-in user's information
-                            final User user_id = new User(email_address,university_ID);
-                            final FirebaseUser user = mAuth.getCurrentUser();
-                            mDatabase.child("Users").addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    mDatabase.child("Users").child(user.getUid().toString()).setValue(user_id);
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
-                                }
-                            });
                             sendEmailVerification();
-                            Log.d(TAG, "Please verify the email address");
-
+                            Log.d(TAG, "createUserWithEmail:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
                             updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
@@ -141,22 +124,18 @@ public class MainActivity extends AppCompatActivity {
                                 Toast.makeText(MainActivity.this, "signInWithEmail:success",
                                         Toast.LENGTH_SHORT).show();
                                 Log.d(TAG, "signInWithEmail:success");
-
-
                                 if(LibrarianOrNot(user.getEmail()))
                                 {
-                                    //if the user is Librarian
-                                    Intent myIntent = new Intent(MainActivity.this, LibrarianActivity.class);
-                                    myIntent.putExtra("Username", user.getEmail());
-                                    startActivity(myIntent);
+                                    Intent intent = new Intent(getApplicationContext(),LibrarianActivity.class);
+                                    intent.putExtra("Username",user.getEmail());
+                                    startActivity(intent);
                                 }
                                 else{
-
-                                    //if the user is Librarian
-                                    Intent myIntent = new Intent(MainActivity.this, PatronActivity.class);
-                                    myIntent.putExtra("Username", user.getEmail());
-                                    startActivity(myIntent);
+                                    Intent intent = new Intent(getApplicationContext(),PatronActivity.class);
+                                    intent.putExtra("Username",user.getEmail());
+                                    startActivity(intent);
                                 }
+
                             }
                             else{
                                 Toast.makeText(MainActivity.this, "signInWithEmail:failed.",
@@ -178,16 +157,6 @@ public class MainActivity extends AppCompatActivity {
         // [END sign_in_with_email]
     }
 
-    private boolean LibrarianOrNot(String Email)
-    {
-        if(Email.indexOf(".edu")==-1)
-        {
-            return false;
-        }
-        else{
-            return true;
-        }
-    }
 
     //the input argument for this function is used to determine if the SignIn or Register is valid or not
     //the boolean variable SignIn, if the option is SignIn then boolean value is true,
@@ -232,14 +201,6 @@ public class MainActivity extends AppCompatActivity {
     //response to the menu item select
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        FirebaseUser user = mAuth.getCurrentUser();
-        if(user==null)
-        {
-            Toast.makeText(MainActivity.this,
-                    "Please Login first",
-                    Toast.LENGTH_SHORT).show();
-            return true;
-        }
         mAuth.signOut();
         updateUI(null);
         Toast.makeText(MainActivity.this,
@@ -250,12 +211,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateUI(FirebaseUser user)
     {
-        if (user == null) {
+        if (user != null) {
+            mUniversityField.setText("");
+        } else {
             mEmailField.setText("");
+            mPasswordField.setText("");
+            mUniversityField.setText("");
         }
-        mPasswordField.setText("");
-        mUniversityField.setText("");
-
     }
 
 
@@ -281,6 +243,18 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
         // [END send_email_verification]
+    }
+
+    private boolean LibrarianOrNot(String input)
+    {
+        if(input.indexOf("@sjsu.edu")!=-1)
+        {
+            //!= -1 means we find @sjsu.edu in the string
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
 }

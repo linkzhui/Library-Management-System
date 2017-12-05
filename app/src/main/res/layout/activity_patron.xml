@@ -9,13 +9,11 @@
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
-        android:layout_height="41dp"
-        android:layout_marginStart="76dp"
-        android:layout_marginTop="40dp"
+        android:layout_height="31dp"
+        android:layout_marginStart="46dp"
+        android:layout_marginTop="42dp"
         android:text="Library Management System"
-        android:textColor="@color/common_google_signin_btn_text_dark_focused"
-        android:textSize="20sp"
-        android:textStyle="bold"
+        android:textSize="25sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -23,21 +21,19 @@
         android:id="@+id/textViewAccount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="47dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginEnd="46dp"
+        android:layout_marginTop="46dp"
         android:text="Account"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <Button
-        android:id="@+id/buttonSearchBook"
+        android:id="@+id/buttonSearch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="15dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="250dp"
+        android:layout_marginStart="46dp"
+        android:layout_marginTop="332dp"
         android:text="Search"
-        app:layout_constraintEnd_toStartOf="@+id/buttonBorrow"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
@@ -45,23 +41,19 @@
         android:id="@+id/buttonBorrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="15dp"
-        android:layout_marginStart="15dp"
+        android:layout_marginEnd="28dp"
+        android:layout_marginStart="27dp"
         android:text="Borrow"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/buttonSearchBook" />
+        app:layout_constraintEnd_toStartOf="@+id/buttonReturn"
+        app:layout_constraintStart_toEndOf="@+id/buttonSearch"
+        app:layout_constraintTop_toTopOf="@+id/buttonSearch" />
 
     <Button
         android:id="@+id/buttonReturn"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="15dp"
+        android:layout_height="47dp"
+        android:layout_marginEnd="46dp"
         android:text="Return"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/buttonBorrow"
         app:layout_constraintTop_toTopOf="@+id/buttonBorrow" />
-
 </android.support.constraint.ConstraintLayout>

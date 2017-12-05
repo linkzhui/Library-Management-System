@@ -8,38 +8,35 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class LibrarianActivity extends AppCompatActivity implements View.OnClickListener {
+public class LibrarianActivity extends AppCompatActivity implements View.OnClickListener{
 
-    private TextView textView_account;
-    private Button button_manage;
-    private Button button_circulation;
-
+    private TextView textViewAccount;
+    private Button buttonManage;
+    private Button buttonCirculation;
+    String username;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_librarian);
         Intent intent = getIntent();
-        String username = intent.getStringExtra("Username");
-        textView_account = findViewById(R.id.textViewAccount);
-        textView_account.setText(username);
-        button_manage = findViewById(R.id.buttonManage);
-        button_manage.setOnClickListener(this);
-        button_circulation = findViewById(R.id.buttonCirculation);
-        button_circulation.setOnClickListener(this);
-
+        username = intent.getStringExtra("Username");
+        textViewAccount = findViewById(R.id.textViewAccount);
+        textViewAccount.setText(username);
+        buttonManage = findViewById(R.id.buttonManage);
+        buttonManage.setOnClickListener(this);
+        buttonCirculation = findViewById(R.id.buttonCirculation);
+        buttonCirculation.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
         if(view.getId() == R.id.buttonManage)
         {
-            Toast.makeText(LibrarianActivity.this,"manage button press",Toast.LENGTH_SHORT).show();
-            return;
+            Toast.makeText(LibrarianActivity.this,"Manage",Toast.LENGTH_SHORT).show();
         }
-        if(view.getId() == R.id.buttonCirculation)
+        else if(view.getId() == R.id.buttonCirculation)
         {
-            Toast.makeText(LibrarianActivity.this,"circulation button press",Toast.LENGTH_SHORT).show();
-            return;
+            Toast.makeText(LibrarianActivity.this,"Circulation",Toast.LENGTH_SHORT).show();
         }
     }
 }
