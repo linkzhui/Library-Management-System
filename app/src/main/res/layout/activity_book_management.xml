@@ -228,7 +228,7 @@
         app:layout_constraintTop_toTopOf="@+id/editTextYear" />
 
     <TextView
-        android:id="@+id/textViewLocation"
+        android:id="@+id/textViewLocationInLib"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"

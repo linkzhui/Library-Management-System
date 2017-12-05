@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
         mEmailField = findViewById(R.id.editTextEmail);
         mPasswordField = findViewById(R.id.editTextPassword);
         mUniversityField = findViewById(R.id.editTextUniversityID);
@@ -77,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
     //Create a account for Librarian or patron,
     //the Librarian can only register use edu email account
     //the patron can register use any email account
-    private void createAccount(String email, String password) {
+    private void createAccount(final String email, String password) {
         Log.d(TAG, "createAccount:" + email);
         if (!validateForm(false)) {
             return;
@@ -90,10 +91,30 @@ public class MainActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             sendEmailVerification();
-                            Log.d(TAG, "createUserWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
+                            Log.d(TAG, "Please check the verification email");
+                            final FirebaseUser user = mAuth.getCurrentUser();
+                            mDatabase.child("Users").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot.hasChild(user.getUid())) {
+                                        Toast.makeText(getBaseContext(), "username is already registered, please change one", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        User new_user = new User(email,mUniversityField.getText().toString());
+                                        // put username as key to set value
+                                        mDatabase.child("Users").child(user.getUid()).setValue(new_user);
+                                        Toast.makeText(getBaseContext(), "Successfully registered", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+
+                            });
                             updateUI(user);
-                        } else {
+                        }
+                        else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
                             Toast.makeText(MainActivity.this, "Authentication failed.",

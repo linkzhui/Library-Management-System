@@ -14,7 +14,7 @@
         tools:context="com.example.raymon.universitylibraryassistance.BookSearchActivity">
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/textViewBookTitle"
             android:layout_width="144dp"
             android:layout_height="33dp"
             android:layout_marginStart="34dp"
@@ -32,7 +32,7 @@
             android:ems="10"
             android:inputType="textPersonName"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView2" />
+            app:layout_constraintTop_toBottomOf="@+id/textViewBookTitle" />
 
         <Button
             android:id="@+id/buttonSearch"
