@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
                             sendEmailVerification();
-                            Log.d(TAG, "createUserWithEmail:success");
+                            Log.d(TAG, "Please verify the email address");
 
                             updateUI(user);
                         } else {
@@ -143,6 +143,20 @@ public class MainActivity extends AppCompatActivity {
                                 Log.d(TAG, "signInWithEmail:success");
 
 
+                                if(LibrarianOrNot(user.getEmail()))
+                                {
+                                    //if the user is Librarian
+                                    Intent myIntent = new Intent(MainActivity.this, LibrarianActivity.class);
+                                    myIntent.putExtra("Username", user.getEmail());
+                                    startActivity(myIntent);
+                                }
+                                else{
+
+                                    //if the user is Librarian
+                                    Intent myIntent = new Intent(MainActivity.this, PatronActivity.class);
+                                    myIntent.putExtra("Username", user.getEmail());
+                                    startActivity(myIntent);
+                                }
                             }
                             else{
                                 Toast.makeText(MainActivity.this, "signInWithEmail:failed.",
@@ -164,14 +178,14 @@ public class MainActivity extends AppCompatActivity {
         // [END sign_in_with_email]
     }
 
-    private String LibrarianOrPatron(String Email)
+    private boolean LibrarianOrNot(String Email)
     {
         if(Email.indexOf(".edu")==-1)
         {
-            return "Patron";
+            return false;
         }
         else{
-            return "Librarian";
+            return true;
         }
     }
 
@@ -236,13 +250,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateUI(FirebaseUser user)
     {
-        if (user != null) {
-            mUniversityField.setText("");
-        } else {
+        if (user == null) {
             mEmailField.setText("");
-            mPasswordField.setText("");
-            mUniversityField.setText("");
         }
+        mPasswordField.setText("");
+        mUniversityField.setText("");
+
     }
 
 

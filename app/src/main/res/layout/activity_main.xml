@@ -7,20 +7,6 @@
     android:orientation="vertical"
     tools:context="com.example.raymon.universitylibraryassistance.MainActivity"
     >
-    <!--<Button-->
-    <!--android:id="@+id/createfile"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:text="Create a file on Google Drive"-->
-    <!--android:onClick="onClickCreateFile"/>-->
-
-    <!--<Button-->
-    <!--android:id="@+id/openfile"-->
-    <!--android:layout_below="@+id/createfile"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:text="Open file from Google Drive"-->
-    <!--android:onClick="onClickOpenFile"/>-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -17,7 +17,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".LibrarianActivity" />
-        <activity android:name=".PatronActivity"></activity>
+        <activity android:name=".PatronActivity" />
+        <activity android:name=".SearchActivity"></activity>
     </application>
 
 </manifest>
