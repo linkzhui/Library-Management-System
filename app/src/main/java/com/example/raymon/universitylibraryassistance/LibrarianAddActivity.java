@@ -29,7 +29,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,12 +43,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 
-public class BookSearchActivity extends AppCompatActivity implements View.OnClickListener{
+public class LibrarianAddActivity extends AppCompatActivity implements View.OnClickListener{
 
     private String username;
     private static EditText editTextInput;
@@ -57,13 +53,12 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
     private static BookListAdapter adapter;
     public static ArrayList<Catalog> book_list = new ArrayList<>();
     private static DatabaseReference mDatabase;
-    private static String TAG = "BookSearchActivity";
-    public static LinkedList<Catalog> borrow_cart = new LinkedList<>();
+    private static String TAG = "LibrarianBookAddActivity";
     public static HashMap<String, Boolean> isSelected = new HashMap<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_book_search);
+        setContentView(R.layout.activity_librarian_add);
         Intent intent = getIntent();
         username = intent.getStringExtra("UserID");
         editTextInput = findViewById(R.id.editTextInput);
@@ -93,28 +88,34 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
 
         if(v.getId()==R.id.ListViewBook)
         {
-            menu.add("Borrow this book");
+            menu.add("Add this book");
         }
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item)
     {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-        if(book_list.get(info.position).getIdle() && isSelected.get(book_list.get(info.position).title)==null)
-        {
-            Toast.makeText(BookSearchActivity.this,"This book have been added to the borrow cart successful",Toast.LENGTH_SHORT).show();
-            borrow_cart.add(book_list.get(info.position));
-            isSelected.put(book_list.get(info.position).title,false);
-        }
-        else if(isSelected.get(book_list.get(info.position).title)!=null){
-            Toast.makeText(BookSearchActivity.this,"This book already existed in the borrow cart",Toast.LENGTH_SHORT).show();
-        }
-        else{
-            Toast.makeText(BookSearchActivity.this,"This book is currently not available",Toast.LENGTH_SHORT).show();
-        }
+        final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+        mDatabase.child("Books").addListenerForSingleValueEvent(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.hasChild(book_list.get(info.position).title))
+                        {
+                            Toast.makeText(getApplicationContext(),"this book already exist in the library",Toast.LENGTH_SHORT).show();
+                        }
+                        else{
+                            mDatabase.child("Books").child(book_list.get(info.position).title).setValue(book_list.get(info.position));
+                            Toast.makeText(getApplicationContext(),"Add this book to database successful",Toast.LENGTH_SHORT).show();
+                        }
+                    }
 
-        return false;
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+        return true;
     }
 
     @Override
@@ -196,128 +197,92 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
         Log.e("Life cycle","parse the JSON");
         Catalog catalog;
 
-            JSONArray book_array = jsonObject.getJSONArray("items");
-            book_list = new ArrayList<>();
-            for(int i = 0;i<Math.min(book_array.length(),5);i++) {
+        JSONArray book_array = jsonObject.getJSONArray("items");
+        book_list = new ArrayList<>();
+        for(int i = 0;i<Math.min(book_array.length(),5);i++) {
 
-                final String[] Current_status = {"IDLE"};
-                String title = "NULL";
+            final String[] Current_status = {"IDLE"};
+            String title = "NULL";
 
-                String call_number = "NULL";
-                String publisher = "NULL";
-                String year_of_publication = "NULL";
-                String keywords;
-                String coverage_image = "";
-                JSONObject temp_book = book_array.getJSONObject(i).getJSONObject("volumeInfo");
-                if (temp_book.has("title"))
-                {
-                    title = temp_book.getString("title");
-                    final String finalTitle = title;
-                    final int finalI = i;
-                    mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            if (dataSnapshot.child("Books").hasChild(finalTitle)) {
-                                Current_status[0] = dataSnapshot.child("Books").child(finalTitle).child("current_status").getValue(String.class);
-                                Log.e("The status of book", Current_status[0] +"!!!!!!!!!!!!!!!!"+"item_index "+ finalI);
-                            }
-                        }
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+            String call_number = "NULL";
+            String publisher = "NULL";
+            String year_of_publication = "NULL";
+            String keywords;
+            String coverage_image = "";
 
-                        }
-
-                    });
-                }
-
-                Log.e("check_again", Current_status[0] +"!!!!!!!");
-
-                //parse the author
-                String prefix = "";
-                String author = "NULL";
-                if(temp_book.has("authors"))
-                {
-                    author = "";
-                    for(int j = 0;j<temp_book.getJSONArray("authors").length();j++)
-                    {
-                        author+=prefix+temp_book.getJSONArray("authors").get(j);
-                        prefix = " ";
-                    }
-                }
-
-                //parse the publisher
-                if(temp_book.has("publisher"))
-                {
-                    publisher = temp_book.getString("publisher");
-                }
-
-                //parse the year of publication
-                if(temp_book.has("publishedDate"))
-                {
-                    year_of_publication = temp_book.getString("publishedDate");
-                    if(year_of_publication.contains("-"))
-                    {
-                        year_of_publication = year_of_publication.substring(0,year_of_publication.indexOf("-"));
-                    }
-                }
-
-                keywords = editTextInput.getText().toString();
-
-                //Search the ISBN for the book
-                String ISBN_13 = "";
-                String ISBN_10 = "";
-                if (temp_book.has("industryIdentifiers")) {
-                    String[] array = new String[2];
-                    for(int j = 0;j<temp_book.getJSONArray("industryIdentifiers").length();j++)
-                    {
-                        array[j] = temp_book.getJSONArray("industryIdentifiers").getJSONObject(j).getString("type");
-                    }
-                    ISBN_13 = array[0];
-                    ISBN_10 = array[1];
-                }
-
-                Bitmap image = null;
-                if(temp_book.getJSONObject("imageLinks").has("smallThumbnail"))
-                {
-                    String image_url = temp_book.getJSONObject("imageLinks").getString("thumbnail");
-                    try {
-                        InputStream in = new java.net.URL(image_url).openStream();
-                        image = BitmapFactory.decodeStream(in);
-                    } catch (Exception e) {
-                        Log.i("Error", e.getMessage());
-                        e.printStackTrace();
-                    }
-
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    image.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                    byte[] byteArray = stream.toByteArray();
-                    coverage_image = Base64.encodeToString(byteArray, Base64.DEFAULT);
-
-                }
-
-                //create catalog for this book, and add the catalog to ArrayList for bookListAdapter and FireBase database
-                catalog = new Catalog(author,call_number,publisher,year_of_publication,keywords,coverage_image, Current_status[0],ISBN_13,ISBN_10);
-                catalog.setTitle(title);
-                book_list.add(catalog);
-                final Catalog finalCatalog = catalog;
-                mDatabase.child("Books").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.hasChild(finalCatalog.title)) {
-                            Log.e(TAG,"the book already existed in the database");
-                        } else {
-                            // put username as key to set value
-                            mDatabase.child("Books").child(finalCatalog.title).setValue(finalCatalog);
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-
-                });
+            JSONObject temp_book = book_array.getJSONObject(i).getJSONObject("volumeInfo");
+            if (temp_book.has("title"))
+            {
+                title = temp_book.getString("title");
             }
+
+            String ISBN_13 = "";
+            String ISBN_10 = "";
+            if (temp_book.has("industryIdentifiers")) {
+                String[] array = new String[2];
+                for(int j = 0;j<temp_book.getJSONArray("industryIdentifiers").length();j++)
+                {
+                    array[j] = temp_book.getJSONArray("industryIdentifiers").getJSONObject(j).getString("type");
+                }
+                ISBN_13 = array[0];
+                ISBN_10 = array[1];
+            }
+
+            //parse the author
+            String prefix = "";
+            String author = "NULL";
+            if(temp_book.has("authors"))
+            {
+                author = "";
+                for(int j = 0;j<temp_book.getJSONArray("authors").length();j++)
+                {
+                    author+=prefix+temp_book.getJSONArray("authors").get(j);
+                    prefix = " ";
+                }
+            }
+
+            //parse the publisher
+            if(temp_book.has("publisher"))
+            {
+                publisher = temp_book.getString("publisher");
+            }
+
+            //parse the year of publication
+            if(temp_book.has("publishedDate"))
+            {
+                year_of_publication = temp_book.getString("publishedDate");
+                if(year_of_publication.contains("-"))
+                {
+                    year_of_publication = year_of_publication.substring(0,year_of_publication.indexOf("-"));
+                }
+            }
+
+            keywords = editTextInput.getText().toString();
+
+            Bitmap image = null;
+            if(temp_book.getJSONObject("imageLinks").has("smallThumbnail"))
+            {
+                String image_url = temp_book.getJSONObject("imageLinks").getString("thumbnail");
+                try {
+                    InputStream in = new java.net.URL(image_url).openStream();
+                    image = BitmapFactory.decodeStream(in);
+                } catch (Exception e) {
+                    Log.i("Error", e.getMessage());
+                    e.printStackTrace();
+                }
+
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                image.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] byteArray = stream.toByteArray();
+                coverage_image = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+            }
+
+            //create catalog for this book, and add the catalog to ArrayList for bookListAdapter and FireBase database
+            catalog = new Catalog(author,call_number,publisher,year_of_publication,keywords,coverage_image, Current_status[0],ISBN_13,ISBN_10);
+            catalog.setTitle(title);
+            book_list.add(catalog);
+        }
     }
     private static boolean isISBN(String book) {
         try {
@@ -369,14 +334,14 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
             TextView current_status = convertView.findViewById(R.id.textViewCurrentStatus);
             TextView key_words = convertView.findViewById(R.id.textViewKeyWords);
             ImageView image = convertView.findViewById(R.id.imageViewCoverage);
-            title.setText("" + book_list.get(i).title);
+            title.setText(book_list.get(i).title);
             author.setText("Author: "+ book_list.get(i).author);
             call_number.setText("Call Number:" + book_list.get(i).call_number);
             publisher.setText("Publisher: "+ book_list.get(i).publisher);
             year_publish.setText("Year publish: "+ book_list.get(i).year_of_publication);
-            Location_in_lib.setText("Location in the library: " + book_list.get(i).location_in_the_library);
-            num_copies.setText("Number of copies: "+book_list.get(i).number_of_copies);
-            current_status.setText("Current Status: "+book_list.get(i).current_status);
+            Location_in_lib.setVisibility(View.GONE);
+            num_copies.setVisibility(View.GONE);
+            current_status.setVisibility(View.GONE);
             key_words.setText("Key Words: "+book_list.get(i).keywords);
 
             //convert the string to bitmap
@@ -394,4 +359,3 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
         }
     }
 }
-
