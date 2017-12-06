@@ -19,7 +19,7 @@ public class LibrarianActivity extends AppCompatActivity implements View.OnClick
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_librarian);
         Intent intent = getIntent();
-        username = intent.getStringExtra("Username");
+        username = intent.getStringExtra("UserID");
         textViewAccount = findViewById(R.id.textViewAccount);
         textViewAccount.setText(username);
         buttonManage = findViewById(R.id.buttonManage);

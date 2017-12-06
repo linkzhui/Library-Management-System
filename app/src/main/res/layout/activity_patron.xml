@@ -38,12 +38,12 @@
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <Button
-        android:id="@+id/buttonBorrow"
+        android:id="@+id/buttonCheckOut"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="28dp"
         android:layout_marginStart="27dp"
-        android:text="Borrow"
+        android:text="Check Out"
         app:layout_constraintEnd_toStartOf="@+id/buttonReturn"
         app:layout_constraintStart_toEndOf="@+id/buttonSearch"
         app:layout_constraintTop_toTopOf="@+id/buttonSearch" />
@@ -52,8 +52,8 @@
         android:id="@+id/buttonReturn"
         android:layout_width="wrap_content"
         android:layout_height="47dp"
-        android:layout_marginEnd="46dp"
+        android:layout_marginEnd="44dp"
         android:text="Return"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/buttonBorrow" />
+        app:layout_constraintTop_toTopOf="@+id/buttonCheckOut" />
 </android.support.constraint.ConstraintLayout>

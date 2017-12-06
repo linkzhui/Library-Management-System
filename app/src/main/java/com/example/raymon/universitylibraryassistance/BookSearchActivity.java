@@ -45,6 +45,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 public class BookSearchActivity extends AppCompatActivity implements View.OnClickListener{
@@ -57,13 +59,14 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
     public static ArrayList<Catalog> book_list = new ArrayList<>();
     private static DatabaseReference mDatabase;
     private static String TAG = "BookSearchActivity";
-    private ArrayList<Catalog> borrow_cart = new ArrayList<>();
+    public static LinkedList<Catalog> borrow_cart = new LinkedList<>();
+    public static HashMap<String, Boolean> isSelected = new HashMap<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_search);
         Intent intent = getIntent();
-        username = intent.getStringExtra("Username");
+        username = intent.getStringExtra("UserID");
         editTextInput = findViewById(R.id.editTextInput);
 
         //set the adapter for the ListView
@@ -101,10 +104,14 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
     public boolean onContextItemSelected(MenuItem item)
     {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-        if(book_list.get(info.position).isIDLE())
+        if(book_list.get(info.position).isIDLE() && isSelected.get(book_list.get(info.position).title)==null)
         {
             Toast.makeText(BookSearchActivity.this,"This book have been added to the borrow cart successful",Toast.LENGTH_SHORT).show();
             borrow_cart.add(book_list.get(info.position));
+            isSelected.put(book_list.get(info.position).title,false);
+        }
+        else if(isSelected.get(book_list.get(info.position).title)!=null){
+            Toast.makeText(BookSearchActivity.this,"This book already existed in the borrow cart",Toast.LENGTH_SHORT).show();
         }
         else{
             Toast.makeText(BookSearchActivity.this,"This book is currently not available",Toast.LENGTH_SHORT).show();

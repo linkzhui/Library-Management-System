@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class PatronActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Button buttonSearch;
-    private Button buttonBorrow;
+    private Button buttonCheckOut;
     private Button buttonReturn;
     private TextView TextViewUsername;
     private String username;
@@ -23,11 +23,11 @@ public class PatronActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_patron);
         Intent intent = getIntent();
-        username = intent.getStringExtra("Username");
+        username = intent.getStringExtra("UserID");
         TextViewUsername = findViewById(R.id.textViewAccount);
         TextViewUsername.setText(username);
-        buttonBorrow = findViewById(R.id.buttonBorrow);
-        buttonBorrow.setOnClickListener(this);
+        buttonCheckOut = findViewById(R.id.buttonCheckOut);
+        buttonCheckOut.setOnClickListener(this);
         buttonReturn = findViewById(R.id.buttonReturn);
         buttonReturn.setOnClickListener(this);
         buttonSearch = findViewById(R.id.buttonSearch);
@@ -36,9 +36,17 @@ public class PatronActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onClick(View view) {
-        if(view.getId() == R.id.buttonBorrow)
+        if(view.getId() == R.id.buttonCheckOut)
         {
-            Toast.makeText(PatronActivity.this,"Borrow",Toast.LENGTH_SHORT).show();
+            if(BookSearchActivity.borrow_cart.size() == 0)
+            {
+                Toast.makeText(PatronActivity.this,"Please go to search area, select some books first",Toast.LENGTH_SHORT).show();
+            }
+            else{
+                Intent intent = new Intent(getApplicationContext(),BookBorrowActivity.class);
+                intent.putExtra("UserID",username);
+                startActivity(intent);
+            }
         }
         else if(view.getId() == R.id.buttonReturn)
         {
@@ -48,7 +56,7 @@ public class PatronActivity extends AppCompatActivity implements View.OnClickLis
         {
             Toast.makeText(PatronActivity.this,"Search",Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(getApplicationContext(),BookSearchActivity.class);
-            intent.putExtra("Username",username);
+            intent.putExtra("UserID",username);
             startActivity(intent);
         }
     }

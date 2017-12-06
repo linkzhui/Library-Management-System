@@ -148,12 +148,12 @@ public class MainActivity extends AppCompatActivity {
                                 if(LibrarianOrNot(user.getEmail()))
                                 {
                                     Intent intent = new Intent(getApplicationContext(),LibrarianActivity.class);
-                                    intent.putExtra("Username",user.getEmail());
+                                    intent.putExtra("UserID",user.getUid());
                                     startActivity(intent);
                                 }
                                 else{
                                     Intent intent = new Intent(getApplicationContext(),PatronActivity.class);
-                                    intent.putExtra("Username",user.getEmail());
+                                    intent.putExtra("UserID",user.getUid());
                                     startActivity(intent);
                                 }
 
