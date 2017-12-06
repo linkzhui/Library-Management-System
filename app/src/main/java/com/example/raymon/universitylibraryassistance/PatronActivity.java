@@ -8,6 +8,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 public class PatronActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Button buttonSearch;
@@ -15,6 +17,7 @@ public class PatronActivity extends AppCompatActivity implements View.OnClickLis
     private Button buttonReturn;
     private TextView TextViewUsername;
     private String username;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

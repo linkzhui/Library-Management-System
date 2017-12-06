@@ -13,12 +13,14 @@
         android:layout_marginTop="14dp"
         android:text="Year of publication"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewPublisher" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewKeyWords" />
 
     <ImageView
         android:id="@+id/imageViewCoverage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="45dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/googleg_standard_color_18" />
@@ -28,6 +30,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="40dp"
+        android:layout_marginTop="20dp"
         android:text="Book Title"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -37,58 +40,57 @@
         android:id="@+id/textViewAuthor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="41dp"
-        android:layout_marginTop="14dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="64dp"
         android:text="Author"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewBookTitle" />
 
     <TextView
         android:id="@+id/textViewCallNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="14dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="14dp"
         android:text="Call Number"
-        app:layout_constraintBottom_toTopOf="@+id/textViewLocationInLib"
-        app:layout_constraintEnd_toEndOf="@+id/textViewLocationInLib" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewAuthor" />
 
     <TextView
         android:id="@+id/textViewPublisher"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="41dp"
         android:layout_marginTop="14dp"
         android:text="Publisher"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewKeyWords" />
+        app:layout_constraintStart_toStartOf="@+id/textViewLocationInLib"
+        app:layout_constraintTop_toBottomOf="@+id/textViewLocationInLib" />
 
     <TextView
         android:id="@+id/textViewLocationInLib"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="14dp"
+        android:layout_marginTop="14dp"
         android:text="Location in the Library"
-        app:layout_constraintBottom_toTopOf="@+id/textViewCopies"
-        app:layout_constraintEnd_toEndOf="@+id/textViewCopies" />
+        app:layout_constraintStart_toStartOf="@+id/textViewCallNumber"
+        app:layout_constraintTop_toBottomOf="@+id/textViewCopies" />
 
     <TextView
         android:id="@+id/textViewCopies"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="34dp"
+        android:layout_marginTop="14dp"
         android:text="Number of copies"
-        app:layout_constraintEnd_toStartOf="@+id/textViewYear"
-        app:layout_constraintTop_toTopOf="@+id/textViewYear" />
+        app:layout_constraintStart_toStartOf="@+id/textViewLocationInLib"
+        app:layout_constraintTop_toBottomOf="@+id/textViewCallNumber" />
 
     <TextView
         android:id="@+id/textViewCurrentStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="41dp"
-        android:layout_marginTop="14dp"
         android:text="Current Status"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewAuthor" />
+        app:layout_constraintTop_toTopOf="@+id/textViewCallNumber" />
 
     <TextView
         android:id="@+id/textViewKeyWords"
@@ -99,4 +101,13 @@
         android:text="Key Word"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewCurrentStatus" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="41dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewPublisher" />
 </android.support.constraint.ConstraintLayout>
