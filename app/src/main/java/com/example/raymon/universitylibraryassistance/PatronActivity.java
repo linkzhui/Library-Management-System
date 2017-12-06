@@ -51,6 +51,9 @@ public class PatronActivity extends AppCompatActivity implements View.OnClickLis
         else if(view.getId() == R.id.buttonReturn)
         {
             Toast.makeText(PatronActivity.this,"Return",Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(getApplicationContext(),BookReturnActivity.class);
+            intent.putExtra("UserID",username);
+            startActivity(intent);
         }
         else if(view.getId() == R.id.buttonSearch)
         {

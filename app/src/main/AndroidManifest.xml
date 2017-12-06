@@ -17,6 +17,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".LibrarianActivity" />
+        <activity android:name=".CirculationActivity" />
         <activity
             android:name=".PatronActivity"
             android:launchMode="singleTop" />
@@ -27,7 +28,8 @@
                 android:value="com.example.raymon.universitylibraryassistance.PatronActivity" />
         </activity>
         <activity android:name=".BookBorrowActivity" />
-        <activity android:name=".BookReturnActivity"></activity>
+        <activity android:name=".BookReturnActivity" />
+        <activity android:name=".BookUpdateActivity"></activity>
     </application>
 
 </manifest>

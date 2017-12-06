@@ -21,7 +21,7 @@ public class Catalog {
     String keywords;
     String coverage_image;
 
-    public Catalog(String Author, String Call_number, String Publisher,String Year_of_publication,String Keywords,String Coverage_image){
+    public Catalog(String Author, String Call_number, String Publisher,String Year_of_publication,String Keywords,String Coverage_image,String Current_status){
         //constructor no number_of_copies, current_status, location_in_the_library
         author = Author;
         call_number = Call_number;
@@ -31,7 +31,7 @@ public class Catalog {
         coverage_image = Coverage_image;
         location_in_the_library = randfloor();
         number_of_copies = 1;
-        current_status = "IDLE";
+        current_status = Current_status;
     }
 
     public Catalog(String Author, String Call_number, String Publisher,String Year_of_publication,String Keywords,String Coverage_image, int Number_of_copies, String Current_status, int Location_in_the_library)

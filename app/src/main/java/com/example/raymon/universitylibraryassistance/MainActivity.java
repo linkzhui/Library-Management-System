@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private Button mLoginButton;
     private DatabaseReference mDatabase;
     private static final String TAG = "EmailPassword";
-
+    private String universityID ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,11 +98,15 @@ public class MainActivity extends AppCompatActivity {
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     if (dataSnapshot.hasChild(user.getUid())) {
                                         Toast.makeText(getBaseContext(), "username is already registered, please change one", Toast.LENGTH_SHORT).show();
+                                        updateUI(null);
                                     } else {
-                                        User new_user = new User(email,mUniversityField.getText().toString());
+
+                                        Log.e("the university ID",universityID);
+                                        User new_user = new User(email,universityID);
                                         // put username as key to set value
                                         mDatabase.child("Users").child(user.getUid()).setValue(new_user);
                                         Toast.makeText(getBaseContext(), "Successfully registered", Toast.LENGTH_SHORT).show();
+                                        updateUI(user);
                                     }
                                 }
 
@@ -112,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
 
                             });
-                            updateUI(user);
+
                         }
                         else {
                             // If sign in fails, display a message to the user.
@@ -201,7 +205,10 @@ public class MainActivity extends AppCompatActivity {
             mPasswordField.setError(null);
         }
 
-        String universityID = mUniversityField.getText().toString();
+
+        universityID = mUniversityField.getText().toString();
+        Log.e("university ID",universityID);
+
         if(!SignIn && TextUtils.isEmpty(universityID))
         {
             //if it is register option, then we need to check if the University ID Field is null or not

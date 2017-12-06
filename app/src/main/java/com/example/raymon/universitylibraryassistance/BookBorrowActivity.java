@@ -56,6 +56,8 @@ public class BookBorrowActivity extends AppCompatActivity implements View.OnClic
         username = intent.getStringExtra("UserID");
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
+
+
     }
 
     @Override
@@ -154,11 +156,23 @@ public class BookBorrowActivity extends AppCompatActivity implements View.OnClic
 
         public ListViewAdapter(Context context) {
             // TODO Auto-generated constructor stub
-            this.beans = BookSearchActivity.borrow_cart;
             this.context = context;
+            this.beans = BookSearchActivity.borrow_cart;
 
         }
 
+        private void inital_data(){
+            mDatabase.child("Users").child(username).child("book_list").addListenerForSingleValueEvent(new ValueEventListener(){
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                System.out.println(snapshot.getValue());  //prints "Do you have data? You'll love Firebase."
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+
+            });
+        }
 
         @Override
         public int getCount() {
@@ -198,7 +212,6 @@ public class BookBorrowActivity extends AppCompatActivity implements View.OnClic
                 // 取出holder
                 holder = (ViewHolder) convertView.getTag();
             }
-            System.out.println(isSelected.toString());
             holder.tvName.setText(bean);
             // 监听checkBox并根据原来的状态来设置新的状态
             holder.LL.setOnClickListener(new View.OnClickListener() {

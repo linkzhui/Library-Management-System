@@ -54,7 +54,6 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
     private String username;
     private static EditText editTextInput;
     private Button buttonSearch;
-    private FirebaseStorage mStorage;
     private static BookListAdapter adapter;
     public static ArrayList<Catalog> book_list = new ArrayList<>();
     private static DatabaseReference mDatabase;
@@ -78,8 +77,6 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
         buttonSearch.setOnClickListener(this);
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        //get the firebase storage reference
-        mStorage = FirebaseStorage.getInstance();
 
         //register the context menu for ListView
         registerForContextMenu(listView);
@@ -124,7 +121,8 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
     protected void onResume() {
         super.onResume();
         Log.e("Life cycle test", "We are at onResume()");
-//        adapter.notifyDataSetChanged();
+        book_list = new ArrayList<>();
+        //adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -194,61 +192,76 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
 
     }
 
-    private static void parseJSON(JSONObject jsonObject)
-    {
+    private static void parseJSON(JSONObject jsonObject) throws JSONException {
         Log.e("Life cycle","parse the JSON");
         Catalog catalog;
-        String title = "NULL";
-        String author = "NULL";
-        String call_number = "NULL";
-        String publisher = "NULL";
-        String year_of_publication = "NULL";
-        String keywords;
-        String coverage_image = "";
-        try {
+
             JSONArray book_array = jsonObject.getJSONArray("items");
             book_list = new ArrayList<>();
-            for(int i = 0;i<Math.min(book_array.length(),3);i++) {
+            for(int i = 0;i<Math.min(book_array.length(),5);i++) {
+
+                final String[] Current_status = {"IDLE"};
+                String title = "NULL";
+
+                String call_number = "NULL";
+                String publisher = "NULL";
+                String year_of_publication = "NULL";
+                String keywords;
+                String coverage_image = "";
                 JSONObject temp_book = book_array.getJSONObject(i).getJSONObject("volumeInfo");
                 if (temp_book.has("title"))
                 {
                     title = temp_book.getString("title");
-                    Log.i("title",title);
+                    final String finalTitle = title;
+                    final int finalI = i;
+                    mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.child("Books").hasChild(finalTitle)) {
+                                Current_status[0] = dataSnapshot.child("Books").child(finalTitle).child("current_status").getValue(String.class);
+                                Log.e("The status of book", Current_status[0] +"!!!!!!!!!!!!!!!!"+"item_index "+ finalI);
+                            }
+                        }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+
+                    });
                 }
+
+                Log.e("check_again", Current_status[0] +"!!!!!!!");
 
                 //parse the author
                 String prefix = "";
+                String author = "NULL";
                 if(temp_book.has("authors"))
                 {
+                    author = "";
                     for(int j = 0;j<temp_book.getJSONArray("authors").length();j++)
                     {
                         author+=prefix+temp_book.getJSONArray("authors").get(j);
                         prefix = " ";
-
                     }
                 }
-                Log.i("author",author);
 
                 //parse the publisher
                 if(temp_book.has("publisher"))
                 {
                     publisher = temp_book.getString("publisher");
                 }
-                Log.i("publisher",publisher);
 
                 //parse the year of publication
                 if(temp_book.has("publishedDate"))
                 {
                     year_of_publication = temp_book.getString("publishedDate");
-                    if(year_of_publication.indexOf("-")!=-1)
+                    if(year_of_publication.contains("-"))
                     {
                         year_of_publication = year_of_publication.substring(0,year_of_publication.indexOf("-"));
                     }
                 }
-                Log.i("Year of Publication",year_of_publication);
 
                 keywords = editTextInput.getText().toString();
-                Log.i("Key words",keywords);
 
                 Bitmap image = null;
                 if(temp_book.getJSONObject("imageLinks").has("smallThumbnail"))
@@ -270,7 +283,7 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
                 }
 
                 //create catalog for this book, and add the catalog to ArrayList for bookListAdapter and FireBase database
-                catalog = new Catalog(author,call_number,publisher,year_of_publication,keywords,coverage_image);
+                catalog = new Catalog(author,call_number,publisher,year_of_publication,keywords,coverage_image, Current_status[0]);
                 catalog.setTitle(title);
                 book_list.add(catalog);
                 final Catalog finalCatalog = catalog;
@@ -281,9 +294,7 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
                             Log.e(TAG,"the book already existed in the database");
                         } else {
                             // put username as key to set value
-
                             mDatabase.child("Books").child(finalCatalog.title).setValue(finalCatalog);
-                            Log.i(TAG,"Store the book catalog into the database");
                         }
                     }
 
@@ -294,10 +305,6 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
 
                 });
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
     }
     private static boolean isISBN(String book) {
         try {
@@ -317,7 +324,6 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
         }
         @Override
         public int getCount() {
-            Log.e("current size",book_list.size()+"");
             return book_list.size();
         }
 
