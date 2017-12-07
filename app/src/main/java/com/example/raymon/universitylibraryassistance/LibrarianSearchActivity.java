@@ -131,7 +131,7 @@ public class LibrarianSearchActivity extends AppCompatActivity implements View.O
 
         }
         else if(view.getId() == R.id.buttonReturn) {
-            Toast.makeText(getApplicationContext(), "Update button press", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), "Update button press", Toast.LENGTH_SHORT).show();
             if (checkInput())
             {
                 Map<String, Object> childUpdates = new HashMap<>();
@@ -149,7 +149,7 @@ public class LibrarianSearchActivity extends AppCompatActivity implements View.O
         }
         else if(view.getId() == R.id.buttonDelete)
         {
-            Toast.makeText(getApplicationContext(),"Delete button press",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(),"Delete button press",Toast.LENGTH_SHORT).show();
             mDatabase.child("Books").child(title).setValue(null);
             cl.setVisibility(View.GONE);
             editTextISBN.setEnabled(true);

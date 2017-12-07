@@ -113,7 +113,7 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
         {
             if(BookSearchActivity.borrow_cart.size() == 0)
             {
-                Toast.makeText(getApplicationContext(),"Please click search button select some books first",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"Please click search button to select some books first",Toast.LENGTH_SHORT).show();
             }
             else{
                 Intent intent = new Intent(getApplicationContext(),BookBorrowActivity.class);

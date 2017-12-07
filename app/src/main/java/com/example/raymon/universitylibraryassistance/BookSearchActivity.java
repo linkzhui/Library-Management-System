@@ -126,12 +126,16 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
 
             if(cat[0].getCurrent_status().equals("IDLE") && !isSelected.containsKey(cat[0].getTitle()))
             {
-                Toast.makeText(getApplicationContext(),"This book have been added into borrow cart",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"This book have been added into borrow cart successful",Toast.LENGTH_SHORT).show();
                 borrow_cart.add(cat[0]);
                 isSelected.put(cat[0].getTitle(),false);
             }
+            else if(isSelected.containsKey(cat[0].getTitle()))
+            {
+                Toast.makeText(getApplicationContext(),"This book is already exist in the borrow cart",Toast.LENGTH_SHORT).show();
+            }
             else{
-                Toast.makeText(getApplicationContext(),"This book is already been borrowed",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"This book is already been borrowed by others",Toast.LENGTH_SHORT).show();
             }
             Log.e("size of List",borrow_cart.size()+"");
         }

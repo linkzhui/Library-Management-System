@@ -31,14 +31,14 @@ public class BookManagementActivity extends AppCompatActivity implements View.On
     public void onClick(View view) {
         if(view.getId() == R.id.buttonAdd)
         {
-            Toast.makeText(this,"u press the add button",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this,"u press the add button",Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(BookManagementActivity.this,LibrarianAddActivity.class);
             intent.putExtra("UserID",username);
             startActivity(intent);
         }
         if(view.getId() == R.id.buttonSearch)
         {
-            Toast.makeText(this,"u press the add button",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this,"u press the add button",Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(BookManagementActivity.this,LibrarianSearchActivity.class);
             intent.putExtra("UserID",username);
             startActivity(intent);

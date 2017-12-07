@@ -32,14 +32,14 @@ public class LibrarianActivity extends AppCompatActivity implements View.OnClick
     public void onClick(View view) {
         if(view.getId() == R.id.buttonManage)
         {
-            Toast.makeText(LibrarianActivity.this,"Manage",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(LibrarianActivity.this,"Manage",Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(getApplicationContext(),BookManagementActivity.class);
             intent.putExtra("UserID",username);
             startActivity(intent);
         }
         else if(view.getId() == R.id.buttonCirculation)
         {
-            Toast.makeText(LibrarianActivity.this,"Circulation",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(LibrarianActivity.this,"Circulation",Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(getApplicationContext(),CirculationActivity.class);
             intent.putExtra("UserID",username);
             startActivity(intent);
