@@ -17,11 +17,19 @@
             </intent-filter>
         </activity>
         <activity android:name=".LibrarianActivity" />
-        <activity android:name=".CirculationActivity" />
+        <activity android:name=".CirculationActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.raymon.universitylibraryassistance.LibrarianActivity" />
+        </activity>
         <activity
             android:name=".PatronActivity"
             android:launchMode="singleTop" />
-        <activity android:name=".BookManagementActivity" />
+        <activity android:name=".BookManagementActivity">
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.example.raymon.universitylibraryassistance.LibrarianActivity" />
+        </activity>
         <activity android:name=".BookSearchActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -29,8 +37,16 @@
         </activity>
         <activity android:name=".BookBorrowActivity" />
         <activity android:name=".BookReturnActivity" />
-        <activity android:name=".LibrarianAddActivity" />
-        <activity android:name=".LibrarianSearchActivity"></activity>
+        <activity android:name=".LibrarianAddActivity">
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.example.raymon.universitylibraryassistance.BookManagementActivity" />
+        </activity>
+        <activity android:name=".LibrarianSearchActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.raymon.universitylibraryassistance.BookManagementActivity" />
+        </activity>
     </application>
 
 </manifest>

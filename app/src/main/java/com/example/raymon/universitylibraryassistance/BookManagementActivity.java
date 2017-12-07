@@ -1,6 +1,7 @@
 package com.example.raymon.universitylibraryassistance;
 
 import android.content.Intent;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -24,7 +25,8 @@ public class BookManagementActivity extends AppCompatActivity implements View.On
         mButtonSearch = findViewById(R.id.buttonSearch);
         mButtonSearch.setOnClickListener(this);
         mButtonSearch.setOnClickListener(this);
-
+        ActionBar ab = getSupportActionBar();
+        ab.setDisplayHomeAsUpEnabled(true);
     }
 
     @Override

@@ -260,23 +260,27 @@ public class LibrarianAddActivity extends AppCompatActivity implements View.OnCl
             keywords = editTextInput.getText().toString();
 
             Bitmap image = null;
-            if(temp_book.getJSONObject("imageLinks").has("smallThumbnail"))
+            if(temp_book.has("imageLinks"))
             {
-                String image_url = temp_book.getJSONObject("imageLinks").getString("thumbnail");
-                try {
-                    InputStream in = new java.net.URL(image_url).openStream();
-                    image = BitmapFactory.decodeStream(in);
-                } catch (Exception e) {
-                    Log.i("Error", e.getMessage());
-                    e.printStackTrace();
+                if(temp_book.getJSONObject("imageLinks").has("smallThumbnail"))
+                {
+                    String image_url = temp_book.getJSONObject("imageLinks").getString("thumbnail");
+                    try {
+                        InputStream in = new java.net.URL(image_url).openStream();
+                        image = BitmapFactory.decodeStream(in);
+                    } catch (Exception e) {
+                        Log.i("Error", e.getMessage());
+                        e.printStackTrace();
+                    }
+
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    image.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    byte[] byteArray = stream.toByteArray();
+                    coverage_image = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
                 }
-
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                image.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                byte[] byteArray = stream.toByteArray();
-                coverage_image = Base64.encodeToString(byteArray, Base64.DEFAULT);
-
             }
+
 
             //create catalog for this book, and add the catalog to ArrayList for bookListAdapter and FireBase database
             catalog = new Catalog(author,call_number,publisher,year_of_publication,keywords,coverage_image, Current_status[0],ISBN_13,ISBN_10);

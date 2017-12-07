@@ -2,6 +2,7 @@ package com.example.raymon.universitylibraryassistance;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -63,6 +64,8 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
         buttonSearch.setOnClickListener(this);
         adapter = new ListViewAdapter(this);
         listView.setAdapter(adapter);
+        ActionBar ab = getSupportActionBar();
+        ab.setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
