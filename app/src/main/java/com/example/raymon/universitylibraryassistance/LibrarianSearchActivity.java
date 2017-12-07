@@ -1,28 +1,14 @@
 package com.example.raymon.universitylibraryassistance;
 
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
-import android.support.v7.app.ActionBar;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Base64;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,24 +16,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.Map;
 
 public class LibrarianSearchActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -56,31 +28,47 @@ public class LibrarianSearchActivity extends AppCompatActivity implements View.O
     private Button buttonUpdate;
     private Button buttonDelete;
     private DatabaseReference mDatabase;
+    private ConstraintLayout cl;
+    private EditText editTextPublisher;
+    private EditText editTextAuthor;
+    private EditText editTextYear;
+    private EditText editTextLocation;
+    private EditText editTextCopies;
+    private EditText editTextStatus;
+    private EditText editTextKeywords;
+    final Catalog[] cat = new Catalog[1];
+    String title = "";
     final String TAG = "Librarian_Search";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_librarian_search);
         editTextISBN = findViewById(R.id.editTextISBN);
+        cl = findViewById(R.id.constraintLayout);
         imageButtonSearch = findViewById(R.id.imageButtonSearch);
         imageButtonSearch.setOnClickListener(this);
         buttonDelete = findViewById(R.id.buttonDelete);
         buttonDelete.setOnClickListener(this);
-        buttonUpdate = findViewById(R.id.buttonUpdate);
+        buttonUpdate = findViewById(R.id.buttonReturn);
         buttonUpdate.setOnClickListener(this);
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
+        editTextPublisher = findViewById(R.id.editTextPublisher);
+        editTextAuthor = findViewById(R.id.editTextAuthor);
+        editTextYear = findViewById(R.id.editTextYear);
+        editTextLocation = findViewById(R.id.editTextLocation);
+        editTextCopies = findViewById(R.id.editTextCopies);
+        editTextStatus = findViewById(R.id.editTextStatus);
+        editTextKeywords = findViewById(R.id.editTextKeywords);
     }
 
     @Override
     public void onClick(View view) {
 
-        final Catalog[] cat = new Catalog[1];
-        if (view.getId() == R.id.imageButtonSearch) {
+
+        if (view.getId() == R.id.imageButtonSearch && checkISBN()) {
             final String input = editTextISBN.getText().toString();
-            if (TextUtils.isEmpty(input)) {
-                editTextISBN.setError("Required.");
-            } else {
+            title = input;
                 if (isISBN(input)) {
                     Log.e(TAG,"find file through ISBN");
                     //the user's input is ISBN
@@ -90,15 +78,23 @@ public class LibrarianSearchActivity extends AppCompatActivity implements View.O
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     for (DataSnapshot child : dataSnapshot.getChildren()) {
-                                        if (child.hasChild("ISBN_13") && child.child("ISBN_13").getValue(String.class) == input) {
+                                        Log.e("isbn",child.child("isbn_thirteen").getValue(String.class));
+                                        if (child.hasChild("isbn_thirteen") && child.child("isbn_thirteen").getValue(String.class).equals(input)) {
+                                            Log.e(TAG,"The book have been founded");
                                             cat[0] = child.getValue(Catalog.class);
+                                            setView(cat[0]);
                                             break;
                                         }
-                                        if (child.hasChild("ISBN_10") && child.child("ISBN_10").getValue(String.class) == input) {
+                                        if (child.hasChild("isbn_ten") && child.child("isbn_ten").getValue(String.class).equals(input)) {
+                                            Log.e(TAG,"The book have been founded");
                                             cat[0] = child.getValue(Catalog.class);
+                                            setView(cat[0]);
                                             break;
                                         }
                                     }
+
+                                    Toast.makeText(getApplicationContext(),"The book is not founded",Toast.LENGTH_SHORT).show();
+
                                 }
 
                                 @Override
@@ -113,20 +109,17 @@ public class LibrarianSearchActivity extends AppCompatActivity implements View.O
                             new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
+
                                     if(dataSnapshot.hasChild(input))
                                     {
-                                        Log.e(TAG,"!!!!!!!!!!!!!");
-                                        cat[0] = dataSnapshot.getValue(Catalog.class);
+                                        Log.e(TAG,"The book have been founded");
+                                        cat[0] = dataSnapshot.child(input).getValue(Catalog.class);
+                                        setView(cat[0]);
                                     }
-//                                    for(DataSnapshot child:dataSnapshot.getChildren())
-//                                    {
-//                                        Log.e("value",child.child("title").getValue(String.class).trim());
-//                                        Log.e("string length",child.child("title").getValue(String.class).trim().length()+"");
-//                                        if(child.child("title").getValue(String.class).trim().equals(input))
-//                                        {
-//
-//                                        }
-//                                    }
+                                    else{
+                                        Toast.makeText(getApplicationContext(),"The book is not founded",Toast.LENGTH_SHORT).show();
+                                    }
+
                                 }
 
                                 @Override
@@ -135,21 +128,107 @@ public class LibrarianSearchActivity extends AppCompatActivity implements View.O
                                 }
                             });
                 }
-                if (cat[0] != null) {
-                    Toast.makeText(getApplicationContext(), "The book is founded!", Toast.LENGTH_SHORT).show();
 
-                } else {
-                    Toast.makeText(getApplicationContext(), "The book is not founded!", Toast.LENGTH_SHORT).show();
-                }
+        }
+        else if(view.getId() == R.id.buttonReturn) {
+            Toast.makeText(getApplicationContext(), "Update button press", Toast.LENGTH_SHORT).show();
+            if (checkInput())
+            {
+                Map<String, Object> childUpdates = new HashMap<>();
 
+                childUpdates.put("/Books/"+title+"/author/",editTextAuthor.getText().toString());
+                childUpdates.put("/Books/"+title+"/current_status/",editTextStatus.getText().toString());
+                childUpdates.put("/Books/"+title+"/keywords/",editTextKeywords.getText().toString());
+                childUpdates.put("/Books/"+title+"/location_in_the_library/",editTextLocation.getText().toString());
+                childUpdates.put("/Books/"+title+"/number_of_copies/",editTextCopies.getText().toString());
+                childUpdates.put("/Books/"+title+"/publisher/",editTextPublisher.getText().toString());
+                childUpdates.put("/Books/"+title+"/year_of_publication/",editTextYear.getText().toString());
+                mDatabase.updateChildren(childUpdates);
+                editTextISBN.setEnabled(true);
             }
+        }
+        else if(view.getId() == R.id.buttonDelete)
+        {
+            Toast.makeText(getApplicationContext(),"Delete button press",Toast.LENGTH_SHORT).show();
+            mDatabase.child("Books").child(title).setValue(null);
+            cl.setVisibility(View.GONE);
+            editTextISBN.setEnabled(true);
         }
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+//        cl.setVisibility(View.INVISIBLE);
+//        editTextISBN.setEnabled(true);
+    }
+
+    private boolean checkISBN(){
+        if(TextUtils.isEmpty(editTextISBN.getText()))
+        {
+            editTextISBN.setError("Required.");
+            return false;
+        }
+        return true;
+    }
+    private boolean checkInput(){
+        boolean valied = true;
+        if(TextUtils.isEmpty(editTextAuthor.getText()))
+        {
+            editTextAuthor.setError("Required.");
+            valied = false;
+        }
+        if(TextUtils.isEmpty(editTextPublisher.getText()))
+        {
+            editTextAuthor.setError("Required.");
+            valied = false;
+        }
+        if(TextUtils.isEmpty(editTextCopies.getText()))
+        {
+            editTextCopies.setError("Required");
+            valied = false;
+        }
+        if(TextUtils.isEmpty(editTextKeywords.getText()))
+        {
+            editTextKeywords.setError("Required");
+            valied = false;
+        }
+        if(TextUtils.isEmpty(editTextStatus.getText()))
+        {
+            editTextStatus.setError("Required");
+            valied = false;
+        }
+        if(TextUtils.isEmpty(editTextYear.getText()))
+        {
+            editTextYear.setError("Required");
+            valied = false;
+        }
+        if(TextUtils.isEmpty(editTextLocation.getText()))
+        {
+            editTextLocation.setError("Required");
+            valied = false;
+        }
+        return valied;
+    }
+
+    private void setView(Catalog catlalog)
+    {
+        cl.setVisibility(View.VISIBLE);
+        editTextISBN.setEnabled(false);
+        editTextPublisher.setText(catlalog.getPublisher());
+        editTextISBN.setText(catlalog.getIsbn_ten());
+        editTextAuthor.setText(catlalog.getAuthor());
+        editTextCopies.setText(catlalog.getNumber_of_copies()+"");
+        editTextKeywords.setText(catlalog.getKeywords());
+        editTextStatus.setText(catlalog.getCurrent_status());
+        editTextYear.setText(catlalog.year_of_publication);
+        editTextLocation.setText(catlalog.location_in_the_library+"");
+    }
 
     private static boolean isISBN(String book) {
         try {
-            Integer.parseInt(book);
+            Long.parseLong(book);
         } catch (NumberFormatException e) {
             return false;
         }

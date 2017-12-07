@@ -56,7 +56,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextISBN">
 
@@ -97,7 +97,6 @@
             android:layout_height="37dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="112dp"
             android:ems="10"
             android:inputType="textPersonName"
             android:text="Year"
@@ -105,7 +104,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.833"
             app:layout_constraintStart_toEndOf="@+id/editTextAuthor"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@+id/editTextLocation" />
 
         <EditText
             android:id="@+id/editTextLocation"
@@ -211,13 +210,12 @@
             android:layout_marginBottom="162dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
             android:text="Year"
             app:layout_constraintBottom_toTopOf="@+id/buttonDelete"
             app:layout_constraintEnd_toStartOf="@+id/editTextYear"
             app:layout_constraintHorizontal_bias="0.963"
             app:layout_constraintStart_toEndOf="@+id/textViewAuthor"
-            app:layout_constraintTop_toTopOf="@+id/editTextYear" />
+            app:layout_constraintTop_toTopOf="@+id/textViewLocationInLib" />
 
         <TextView
             android:id="@+id/textViewLocationInLib"
@@ -243,10 +241,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.05"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/editText9" />
+            app:layout_constraintTop_toTopOf="@+id/editTextKeywords" />
 
         <EditText
-            android:id="@+id/editText9"
+            android:id="@+id/editTextKeywords"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -262,7 +260,7 @@
             app:layout_constraintTop_toBottomOf="@+id/editTextStatus" />
 
         <Button
-            android:id="@+id/buttonUpdate"
+            android:id="@+id/buttonReturn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -272,7 +270,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.192"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editText9" />
+            app:layout_constraintTop_toBottomOf="@+id/editTextKeywords" />
 
         <Button
             android:id="@+id/buttonDelete"
@@ -283,8 +281,8 @@
             android:text="Delete"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toEndOf="@+id/buttonUpdate"
-            app:layout_constraintTop_toTopOf="@+id/buttonUpdate" />
+            app:layout_constraintStart_toEndOf="@+id/buttonReturn"
+            app:layout_constraintTop_toTopOf="@+id/buttonReturn" />
     </android.support.constraint.ConstraintLayout>
 
 

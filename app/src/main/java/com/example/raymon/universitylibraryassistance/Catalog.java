@@ -15,15 +15,13 @@ public class Catalog {
     String call_number;
     String publisher;
     String year_of_publication;
-    int location_in_the_library;
-    int number_of_copies;
+    String location_in_the_library;
+    String number_of_copies;
     String current_status;
     String keywords;
     String coverage_image;
-    String isbn_thirten;
+    String isbn_thirteen;
     String isbn_ten;
-    boolean idle;
-
     public String getAuthor() {
         return author;
     }
@@ -38,14 +36,14 @@ public class Catalog {
         year_of_publication = Year_of_publication;
         keywords = Keywords;
         coverage_image = Coverage_image;
-        location_in_the_library = randfloor();
-        number_of_copies = 1;
+        location_in_the_library = randfloor()+"";
+        number_of_copies = "1";
         current_status = Current_status;
         this.isbn_ten = ISBN_10;
-        this.isbn_thirten = ISBN_13;
+        this.isbn_thirteen = ISBN_13;
     }
 
-    public Catalog(String author, String title, String call_number, String publisher, String year_of_publication, int location_in_the_library, int number_of_copies, String current_status, String keywords, String coverage_image, String isbn_thirten, String isbn_ten, boolean idle) {
+    public Catalog(String author, String title, String call_number, String publisher, String year_of_publication, String location_in_the_library, String number_of_copies, String current_status, String keywords, String coverage_image, String isbn_thirteen, String isbn_ten) {
         this.author = author;
         this.title = title;
         this.call_number = call_number;
@@ -56,22 +54,10 @@ public class Catalog {
         this.current_status = current_status;
         this.keywords = keywords;
         this.coverage_image = coverage_image;
-        this.isbn_thirten = isbn_thirten;
+        this.isbn_thirteen = isbn_thirteen;
         this.isbn_ten = isbn_ten;
-        this.idle = idle;
     }
 
-    public Catalog(String Author, String Call_number, String Publisher, String Year_of_publication, String Keywords, String Coverage_image, int Number_of_copies, String Current_status, int Location_in_the_library) {
-        author = Author;
-        call_number = Call_number;
-        publisher = Publisher;
-        year_of_publication = Year_of_publication;
-        keywords = Keywords;
-        coverage_image = Coverage_image;
-        location_in_the_library = Location_in_the_library;
-        number_of_copies = Number_of_copies;
-        current_status = Current_status;
-    }
 
     public Catalog() {
 
@@ -112,11 +98,11 @@ public class Catalog {
         this.year_of_publication = year_of_publication;
     }
 
-    public void setLocation_in_the_library(int location_in_the_library) {
+    public void setLocation_in_the_library(String location_in_the_library) {
         this.location_in_the_library = location_in_the_library;
     }
 
-    public void setNumber_of_copies(int number_of_copies) {
+    public void setNumber_of_copies(String number_of_copies) {
         this.number_of_copies = number_of_copies;
     }
 
@@ -132,18 +118,12 @@ public class Catalog {
         this.coverage_image = coverage_image;
     }
 
-    public void setIsbn_thirten(String ISBN13) {
-        this.isbn_thirten = ISBN13;
-    }
 
     public void setIsbn_ten(String ISBN10)
     {
         this.isbn_ten = ISBN10;
     }
 
-    public void setIdle(boolean idle) {
-        this.idle = idle;
-    }
 
     public String getTitle() {
         return title;
@@ -161,11 +141,11 @@ public class Catalog {
         return year_of_publication;
     }
 
-    public int getLocation_in_the_library() {
+    public String getLocation_in_the_library() {
         return location_in_the_library;
     }
 
-    public int getNumber_of_copies() {
+    public String getNumber_of_copies() {
         return number_of_copies;
     }
 
@@ -181,15 +161,7 @@ public class Catalog {
         return coverage_image;
     }
 
-    public String getIsbn_thirten() {
-        return isbn_thirten;
-    }
-
     public String getIsbn_ten() {
         return isbn_ten;
-    }
-
-    public boolean getIdle() {
-        return idle;
     }
 }

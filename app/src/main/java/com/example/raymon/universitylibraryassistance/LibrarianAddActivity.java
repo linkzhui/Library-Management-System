@@ -222,7 +222,7 @@ public class LibrarianAddActivity extends AppCompatActivity implements View.OnCl
                 String[] array = new String[2];
                 for(int j = 0;j<temp_book.getJSONArray("industryIdentifiers").length();j++)
                 {
-                    array[j] = temp_book.getJSONArray("industryIdentifiers").getJSONObject(j).getString("type");
+                    array[j] = temp_book.getJSONArray("industryIdentifiers").getJSONObject(j).getString("identifier");
                 }
                 ISBN_13 = array[0];
                 ISBN_10 = array[1];

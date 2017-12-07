@@ -101,7 +101,7 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
     public boolean onContextItemSelected(MenuItem item)
     {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-        if(book_list.get(info.position).getIdle() && isSelected.get(book_list.get(info.position).title)==null)
+        if(book_list.get(info.position).getCurrent_status().equals("IDLE") && isSelected.get(book_list.get(info.position).title)==null)
         {
             Toast.makeText(BookSearchActivity.this,"This book have been added to the borrow cart successful",Toast.LENGTH_SHORT).show();
             borrow_cart.add(book_list.get(info.position));
@@ -270,7 +270,7 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
                     String[] array = new String[2];
                     for(int j = 0;j<temp_book.getJSONArray("industryIdentifiers").length();j++)
                     {
-                        array[j] = temp_book.getJSONArray("industryIdentifiers").getJSONObject(j).getString("type");
+                        array[j] = temp_book.getJSONArray("industryIdentifiers").getJSONObject(j).getString("identifier");
                     }
                     ISBN_13 = array[0];
                     ISBN_10 = array[1];
