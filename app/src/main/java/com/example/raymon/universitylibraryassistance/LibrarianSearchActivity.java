@@ -81,13 +81,40 @@ public class LibrarianSearchActivity extends AppCompatActivity implements View.O
                                         Log.e("isbn",child.child("isbn_thirteen").getValue(String.class));
                                         if (child.hasChild("isbn_thirteen") && child.child("isbn_thirteen").getValue(String.class).equals(input)) {
                                             Log.e(TAG,"The book have been founded");
-                                            cat[0] = child.getValue(Catalog.class);
+
+                                            String author = dataSnapshot.child(input).child("author").getValue(String.class);
+                                            String call_number = dataSnapshot.child(input).child("call_number").getValue(String.class);
+                                            String coverage_image = dataSnapshot.child(input).child("coverage_image").getValue(String.class);
+                                            String current_status = dataSnapshot.child(input).child("current_status").getValue(String.class);
+                                            String isbn_ten = dataSnapshot.child(input).child("isbn_ten").getValue(String.class);
+                                            String isbn_thirteen = dataSnapshot.child(input).child("isbn_thirteen").getValue(String.class);
+                                            String keywords = dataSnapshot.child(input).child("keywords").getValue(String.class);
+                                            String location_in_the_library = dataSnapshot.child(input).child("location_in_the_library").getValue(String.class);
+                                            String number_of_copies = dataSnapshot.child(input).child("number_of_copies").getValue(String.class);
+                                            String publisher = dataSnapshot.child(input).child("publisher").getValue(String.class);
+                                            String title = dataSnapshot.child(input).child("title").getValue(String.class);
+                                            String year_of_publication = dataSnapshot.child(input).child("year_of_publication").getValue(String.class);
+                                            cat[0] = new Catalog(author,title, call_number, publisher, year_of_publication, location_in_the_library, number_of_copies, current_status, keywords, coverage_image, isbn_thirteen, isbn_ten);
+                                            //cat[0] = dataSnapshot.child(input).getValue(Catalog.class);
                                             setView(cat[0]);
                                             break;
                                         }
                                         if (child.hasChild("isbn_ten") && child.child("isbn_ten").getValue(String.class).equals(input)) {
                                             Log.e(TAG,"The book have been founded");
-                                            cat[0] = child.getValue(Catalog.class);
+                                            String author = dataSnapshot.child(input).child("author").getValue(String.class);
+                                            String call_number = dataSnapshot.child(input).child("call_number").getValue(String.class);
+                                            String coverage_image = dataSnapshot.child(input).child("coverage_image").getValue(String.class);
+                                            String current_status = dataSnapshot.child(input).child("current_status").getValue(String.class);
+                                            String isbn_ten = dataSnapshot.child(input).child("isbn_ten").getValue(String.class);
+                                            String isbn_thirteen = dataSnapshot.child(input).child("isbn_thirteen").getValue(String.class);
+                                            String keywords = dataSnapshot.child(input).child("keywords").getValue(String.class);
+                                            String location_in_the_library = dataSnapshot.child(input).child("location_in_the_library").getValue(String.class);
+                                            String number_of_copies = dataSnapshot.child(input).child("number_of_copies").getValue(String.class);
+                                            String publisher = dataSnapshot.child(input).child("publisher").getValue(String.class);
+                                            String title = dataSnapshot.child(input).child("title").getValue(String.class);
+                                            String year_of_publication = dataSnapshot.child(input).child("year_of_publication").getValue(String.class);
+                                            cat[0] = new Catalog(author,title, call_number, publisher, year_of_publication, location_in_the_library, number_of_copies, current_status, keywords, coverage_image, isbn_thirteen, isbn_ten);
+                                            //cat[0] = dataSnapshot.child(input).getValue(Catalog.class);
                                             setView(cat[0]);
                                             break;
                                         }
@@ -113,7 +140,21 @@ public class LibrarianSearchActivity extends AppCompatActivity implements View.O
                                     if(dataSnapshot.hasChild(input))
                                     {
                                         Log.e(TAG,"The book have been founded");
-                                        cat[0] = dataSnapshot.child(input).getValue(Catalog.class);
+                                        String author = dataSnapshot.child(input).child("author").getValue(String.class);
+                                        String call_number = dataSnapshot.child(input).child("call_number").getValue(String.class);
+                                        String coverage_image = dataSnapshot.child(input).child("coverage_image").getValue(String.class);
+                                        String current_status = dataSnapshot.child(input).child("current_status").getValue(String.class);
+                                        String isbn_ten = dataSnapshot.child(input).child("isbn_ten").getValue(String.class);
+                                        String isbn_thirteen = dataSnapshot.child(input).child("isbn_thirteen").getValue(String.class);
+                                        String keywords = dataSnapshot.child(input).child("keywords").getValue(String.class);
+                                        String location_in_the_library = dataSnapshot.child(input).child("location_in_the_library").getValue(String.class);
+                                        String number_of_copies = dataSnapshot.child(input).child("number_of_copies").getValue(String.class);
+                                        String publisher = dataSnapshot.child(input).child("publisher").getValue(String.class);
+                                        String title = dataSnapshot.child(input).child("title").getValue(String.class);
+                                        String year_of_publication = dataSnapshot.child(input).child("year_of_publication").getValue(String.class);
+                                        cat[0] = new Catalog(author,title, call_number, publisher, year_of_publication, location_in_the_library, number_of_copies, current_status, keywords, coverage_image, isbn_thirteen, isbn_ten);
+                                        //cat[0] = dataSnapshot.child(input).getValue(Catalog.class);
+
                                         setView(cat[0]);
                                     }
                                     else{
@@ -150,9 +191,32 @@ public class LibrarianSearchActivity extends AppCompatActivity implements View.O
         else if(view.getId() == R.id.buttonDelete)
         {
             //Toast.makeText(getApplicationContext(),"Delete button press",Toast.LENGTH_SHORT).show();
-            mDatabase.child("Books").child(title).setValue(null);
-            cl.setVisibility(View.GONE);
-            editTextISBN.setEnabled(true);
+            mDatabase.child("Books").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if(!dataSnapshot.child("current_status").getValue(String.class).equals("IDLE"))
+                    {
+                        //current book is borrowed by someone, cannot delete yet
+                        Toast.makeText(getApplicationContext(),"Cannot delete, this book still borrow by someone",Toast.LENGTH_SHORT).show();
+                        cl.setVisibility(View.GONE);
+                        editTextISBN.setEnabled(true);
+                    }
+                    else{
+                        //Delete this book
+                        mDatabase.child("Books").child(title).setValue(null);
+                        cl.setVisibility(View.GONE);
+                        editTextISBN.setEnabled(true);
+                        Toast.makeText(getApplicationContext(),"Delete book successful!",Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+
         }
     }
 
@@ -217,7 +281,7 @@ public class LibrarianSearchActivity extends AppCompatActivity implements View.O
         cl.setVisibility(View.VISIBLE);
         editTextISBN.setEnabled(false);
         editTextPublisher.setText(catlalog.getPublisher());
-        editTextISBN.setText(catlalog.getIsbn_ten());
+        editTextISBN.setText(catlalog.getTitle());
         editTextAuthor.setText(catlalog.getAuthor());
         editTextCopies.setText(catlalog.getNumber_of_copies()+"");
         editTextKeywords.setText(catlalog.getKeywords());

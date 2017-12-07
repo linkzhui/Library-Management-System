@@ -1,5 +1,6 @@
 package com.example.raymon.universitylibraryassistance;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.constraint.ConstraintLayout;
@@ -21,12 +22,16 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 
 public class BookSearchActivity extends AppCompatActivity implements View.OnClickListener{
 
+    String username;
     ImageButton imageButtonSearch;
     private Button buttonBorrow;
     private DatabaseReference mDatabase;
@@ -35,12 +40,16 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
     final Catalog[] cat = new Catalog[1];
     public static LinkedList<Catalog> borrow_cart = new LinkedList<>();
     public static HashMap<String,Boolean> isSelected = new HashMap<>();
+    private Button buttonWaitList;
+
     String title = "";
     final String TAG = "Book_Search";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_search);
+        Intent intent = getIntent();
+        username = intent.getStringExtra("UserID");
         cl = findViewById(R.id.constraintLayoutBook);
         imageButtonSearch = findViewById(R.id.imageButtonSearch);
         imageButtonSearch.setOnClickListener(this);
@@ -48,12 +57,12 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
         buttonBorrow = findViewById(R.id.buttonBorrow);
         buttonBorrow.setOnClickListener(this);
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        buttonWaitList = findViewById(R.id.buttonWaitList);
+        buttonWaitList.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
-
-
         if (view.getId() == R.id.imageButtonSearch && checkISBN()) {
             final String input = editTextISBN.getText().toString();
             title = input;
@@ -102,7 +111,20 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
                                 if(dataSnapshot.hasChild(input))
                                 {
                                     Log.e(TAG,"The book have been founded");
-                                    cat[0] = dataSnapshot.child(input).getValue(Catalog.class);
+                                    String author = dataSnapshot.child(input).child("author").getValue(String.class);
+                                    String call_number = dataSnapshot.child(input).child("call_number").getValue(String.class);
+                                    String coverage_image = dataSnapshot.child(input).child("coverage_image").getValue(String.class);
+                                    String current_status = dataSnapshot.child(input).child("current_status").getValue(String.class);
+                                    String isbn_ten = dataSnapshot.child(input).child("isbn_ten").getValue(String.class);
+                                    String isbn_thirteen = dataSnapshot.child(input).child("isbn_thirteen").getValue(String.class);
+                                    String keywords = dataSnapshot.child(input).child("keywords").getValue(String.class);
+                                    String location_in_the_library = dataSnapshot.child(input).child("location_in_the_library").getValue(String.class);
+                                    String number_of_copies = dataSnapshot.child(input).child("number_of_copies").getValue(String.class);
+                                    String publisher = dataSnapshot.child(input).child("publisher").getValue(String.class);
+                                    String title = dataSnapshot.child(input).child("title").getValue(String.class);
+                                    String year_of_publication = dataSnapshot.child(input).child("year_of_publication").getValue(String.class);
+                                    cat[0] = new Catalog(author,title, call_number, publisher, year_of_publication, location_in_the_library, number_of_copies, current_status, keywords, coverage_image, isbn_thirteen, isbn_ten);
+                                    //cat[0] = dataSnapshot.child(input).getValue(Catalog.class);
                                     setView(cat[0]);
                                 }
                                 else{
@@ -138,6 +160,68 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
                 Toast.makeText(getApplicationContext(),"This book is already been borrowed by others",Toast.LENGTH_SHORT).show();
             }
             Log.e("size of List",borrow_cart.size()+"");
+            buttonBorrow.setVisibility(View.INVISIBLE);
+            buttonWaitList.setVisibility(View.INVISIBLE);
+            cl.setVisibility(View.INVISIBLE);
+            editTextISBN.setText("");
+
+        }
+        else if (view.getId() == R.id.buttonWaitList)
+        {
+
+            mDatabase.child("Books").child(cat[0].title).addListenerForSingleValueEvent(
+                    //
+                    new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            if(!dataSnapshot.child("borrowed_by").getValue(String.class).equals(username)){
+                                if(!dataSnapshot.hasChild("waiting_list"))
+                                {
+                                    //if the waiting list for this book is empty
+                                    DateFormat df = new SimpleDateFormat("MM/dd/yy");
+                                    Date dateobj = new Date();
+                                    mDatabase.child("Books").child(cat[0].title).child("waiting_list").child(username).setValue(df.format(dateobj));
+                                    Toast.makeText(getApplicationContext(),"Add to the waiting list successful!",Toast.LENGTH_SHORT).show();
+
+
+                                }
+                                else{
+                                    //check if current user is exist in the waiting list or not
+                                    if(dataSnapshot.child("waiting_list").hasChild(username))
+                                    {
+                                        //user already exist in the waiting list
+                                        Toast.makeText(getApplicationContext(),"you already exist in the waiting list",Toast.LENGTH_SHORT).show();
+                                    }
+                                    else{
+                                        //add user to the waiting list
+                                        DateFormat df = new SimpleDateFormat("MM/dd/yy");
+                                        Date dateobj = new Date();
+                                        mDatabase.child("Books").child(cat[0].title).child("waiting_list").child(username).setValue(df.format(dateobj));
+                                        Toast.makeText(getApplicationContext(),"Add to the waiting list successful!",Toast.LENGTH_SHORT).show();
+                                    }
+
+                                }
+                            }
+                            else{
+                                Toast.makeText(getApplicationContext(),"You already borrowed this book, you cannot add yourself into the waiting list",Toast.LENGTH_SHORT).show();
+                            }
+
+                            buttonBorrow.setVisibility(View.INVISIBLE);
+                            buttonWaitList.setVisibility(View.INVISIBLE);
+                            cl.setVisibility(View.INVISIBLE);
+                            editTextISBN.setText("");
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+
+
+                    });
+
+
         }
     }
 
@@ -161,7 +245,13 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
     private void setView(Catalog catlalog)
     {
         cl.setVisibility(View.VISIBLE);
-        buttonBorrow.setVisibility(View.VISIBLE);
+        if(catlalog.getCurrent_status().equals("IDLE"))
+        {
+            buttonBorrow.setVisibility(View.VISIBLE);
+        }
+        else{
+            buttonWaitList.setVisibility(View.VISIBLE);
+        }
         TextView title = findViewById(R.id.textViewBookTitle);
         TextView author = findViewById(R.id.textViewAuthor);
         TextView call_number = findViewById(R.id.textViewCallNumber);

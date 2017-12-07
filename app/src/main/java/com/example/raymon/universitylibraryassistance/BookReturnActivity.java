@@ -90,6 +90,7 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
                             Log.e("The book is founded","!!!!!!!!!!!!!!!!");
                             mDatabase.child("Users").child(username).child("bookList").child(element.title).setValue(null);
                             mDatabase.child("Books").child(element.title).child("current_status").setValue("IDLE");
+                            mDatabase.child("Books").child(element.title).child("borrowed_by").setValue("NULL");
                             //need to check if the user need to pay the fee or not
                         }
                     }

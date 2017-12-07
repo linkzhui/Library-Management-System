@@ -173,14 +173,23 @@
         android:id="@+id/buttonBorrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="162dp"
-        android:layout_marginStart="161dp"
-        android:layout_marginTop="55dp"
+        android:layout_marginStart="160dp"
+        android:layout_marginTop="48dp"
         android:text="Borrow"
         android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayoutBook" />
+
+    <Button
+        android:id="@+id/buttonWaitList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="148dp"
+        android:layout_marginTop="34dp"
+        android:text="Waiting List"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonBorrow" />
 
 
 </android.support.constraint.ConstraintLayout>

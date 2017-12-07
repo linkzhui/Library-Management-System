@@ -92,8 +92,10 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
                             buttonBorrow.setVisibility(View.VISIBLE);
                             buttonReturn.setVisibility(View.VISIBLE);
                             buttonSearch.setVisibility(View.VISIBLE);
+                            break;
                         }
                     }
+                    Toast.makeText(getApplicationContext(),"user name does not exist",Toast.LENGTH_SHORT).show();
                 }
 
                 @Override

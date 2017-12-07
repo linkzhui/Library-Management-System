@@ -99,7 +99,6 @@ public class BookBorrowActivity extends AppCompatActivity implements View.OnClic
                 }
             }
 
-            current_borrowed_book[0]+=mark.size();
             for(final Catalog element:mark)
             {
 
@@ -110,16 +109,17 @@ public class BookBorrowActivity extends AppCompatActivity implements View.OnClic
                         if (dataSnapshot.child(username).child("bookList").hasChild(element.title)) {
                             Log.e(TAG,"the book already existed in the database");
                         } else {
+                            int book_count = (int)dataSnapshot.child(username).child("bookList").getChildrenCount();
                             // put username as key to set value
                             DateFormat df = new SimpleDateFormat("MM/dd/yy");
                             Date dateobj = new Date();
                             mDatabase.child("Users").child(username).child("bookList").child(element.title).setValue(df.format(dateobj));
+                            mDatabase.child("Books").child(element.title).child("borrowed_by").setValue(username);
                             Log.i(TAG,"Store the book catalog into the database");
                             Map<String, Object> childUpdates = new HashMap<>();
                             User user = dataSnapshot.child(username).getValue(User.class);
-                            int current_borrowed_book = user.num_of_borrowed_book;
                             childUpdates.put("/Books/"+element.title+"/current_status/","Borrow");
-                            childUpdates.put("/Users/"+username+"/num_of_borrowed_book/",current_borrowed_book+1);
+                            childUpdates.put("/Users/"+username+"/num_of_borrowed_book/",book_count+1);
                             mDatabase.updateChildren(childUpdates);
                         }
                     }
