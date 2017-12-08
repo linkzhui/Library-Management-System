@@ -46,7 +46,17 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
     ListViewAdapter adapter;
     private int total_borrow_book_count = 0;
     private int check_box_count = 0;
+    final boolean[] found = new boolean[1];
+    protected void onResume() {
 
+        super.onResume();
+
+    }
+
+    protected void onRestart() {
+        super.onRestart();
+        adapter.notifyDataSetChanged();
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
@@ -72,6 +82,7 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
     public void onClick(View view) {
         if(view.getId()==R.id.imageButtonSearch && checkEmail())
         {
+
             mDatabase.child("Users").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -83,6 +94,7 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
                             total_borrow_book_count = (int) child.child("bookList").getChildrenCount();
                             for(DataSnapshot element:child.child("bookList").getChildren())
                             {
+                                found[0] = true;
                                 String key = element.getKey();
                                 Log.e("key",element.getKey());
                                 String value = element.getValue(String.class);
@@ -95,10 +107,14 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
                             buttonBorrow.setVisibility(View.VISIBLE);
                             buttonReturn.setVisibility(View.VISIBLE);
                             buttonSearch.setVisibility(View.VISIBLE);
-                            break;
+
                         }
                     }
-                    Toast.makeText(getApplicationContext(),"user name does not exist",Toast.LENGTH_SHORT).show();
+                    if(!found[0])
+                    {
+                        Toast.makeText(getApplicationContext(),"user name does not exist",Toast.LENGTH_SHORT).show();
+                    }
+
                 }
 
                 @Override
@@ -124,6 +140,7 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
                 Intent intent = new Intent(getApplicationContext(),BookBorrowActivity.class);
                 intent.putExtra("UserID",username);
                 startActivity(intent);
+
             }
         }
         else if(view.getId()==R.id.buttonReturn)
@@ -189,7 +206,6 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
 
 
         // 用来控制CheckBox的选中状况
-
 
 
         class ViewHolder {
