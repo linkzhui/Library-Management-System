@@ -231,9 +231,12 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         mAuth.signOut();
         updateUI(null);
-        Toast.makeText(MainActivity.this,
-                "Logout successful",
-                Toast.LENGTH_SHORT).show();
+//        Toast.makeText(MainActivity.this,
+//                "Logout successful",
+//                Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+        startActivity(intent);
+
         return true;
     }
 

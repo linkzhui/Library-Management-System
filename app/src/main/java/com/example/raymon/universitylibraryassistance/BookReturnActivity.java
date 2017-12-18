@@ -16,20 +16,14 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class BookReturnActivity extends AppCompatActivity implements ViewStub.OnClickListener {
 
@@ -39,10 +33,14 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
     private Button buttonReturn;
     private int check_box_count = 0;
     ListViewAdapter adapter;
+
+    //user ID:
     String username;
     private DatabaseReference mDatabase;
     String TAG = "BookReturnActivity";
     int total_borrow_book_count = 0;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +65,8 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
             Toast.makeText(this,"Check out successful",Toast.LENGTH_SHORT).show();
             Log.e("size",BorrowedBookList.size()+"");
             final List<book> mark = new LinkedList<>();
+
+
             for(book element:BorrowedBookList)
             {
 
@@ -74,11 +74,15 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
                 {
                     //update the database
                     isSelected.remove(element.title);
+                    //return book add to List -> mark
                     mark.add(element);
                     check_box_count--;
                 }
             }
             int return_book_count = mark.size();
+
+
+            //return email confirmation
             for(final book element:mark)
             {
 
@@ -138,6 +142,7 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
             mDatabase = FirebaseDatabase.getInstance().getReference();
             mDatabase.child("Users").child(username).child("bookList").addListenerForSingleValueEvent(new ValueEventListener(){
                 @Override
+
                 public void onDataChange(DataSnapshot snapshot) {
                     total_borrow_book_count=(int) snapshot.getChildrenCount();
                     for(DataSnapshot child:snapshot.getChildren())
