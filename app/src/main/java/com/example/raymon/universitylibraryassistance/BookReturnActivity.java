@@ -80,9 +80,7 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
                 }
             }
             int return_book_count = mark.size();
-
-            //String useremail;
-            //String[] booklist = new String[mark.size()];
+        
 
             //return email confirmation
             for(final book element:mark) {
