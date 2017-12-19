@@ -80,12 +80,11 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
                 }
             }
             int return_book_count = mark.size();
-
+        
 
             //return email confirmation
-            for(final book element:mark)
-            {
-
+            //
+            for(final book element:mark) {
                 mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -96,6 +95,10 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
                             mDatabase.child("Books").child(element.title).child("current_status").setValue("IDLE");
                             mDatabase.child("Books").child(element.title).child("borrowed_by").setValue("NULL");
                             //need to check if the user need to pay the fee or not
+                            String useremail = dataSnapshot.child("Users").child(username).child("email").getValue(String.class);
+                            String booktitle = element.title;
+                            sendEmail(useremail,booktitle);
+
                         }
                     }
 
@@ -110,7 +113,19 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
 
         mDatabase.child("Users").child(username).child("num_of_borrowed_book").setValue(null);
         mDatabase.child("Users").child(username).child("num_of_borrowed_book").setValue(total_borrow_book_count-return_book_count);
+
     }
+
+    private void sendEmail(String email, String message) {
+        //Getting content for email
+        //Creating SendMail object
+        String subject = "Return Book Confirmation";
+        EmailReturnConfirmation sm = new EmailReturnConfirmation(this, email, subject, message);
+
+        //Executing sendmail to send email
+        sm.execute();
+    }
+
 
     class ListViewAdapter extends BaseAdapter {
 
