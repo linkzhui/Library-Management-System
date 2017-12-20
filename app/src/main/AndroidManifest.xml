@@ -26,9 +26,9 @@
             android:name=".PatronActivity"
             android:launchMode="singleTop" />
         <activity android:name=".BookManagementActivity">
-        <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value="com.example.raymon.universitylibraryassistance.LibrarianActivity" />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.raymon.universitylibraryassistance.LibrarianActivity" />
         </activity>
         <activity android:name=".BookSearchActivity">
             <meta-data
@@ -38,15 +38,19 @@
         <activity android:name=".BookBorrowActivity" />
         <activity android:name=".BookReturnActivity" />
         <activity android:name=".LibrarianAddActivity">
-        <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value="com.example.raymon.universitylibraryassistance.BookManagementActivity" />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.raymon.universitylibraryassistance.BookManagementActivity" />
         </activity>
         <activity android:name=".LibrarianSearchActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.raymon.universitylibraryassistance.BookManagementActivity" />
         </activity>
+        <activity
+            android:name=".LibrarianCustomAddActivity"
+            android:label="@string/title_activity_librarian_custom_add"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

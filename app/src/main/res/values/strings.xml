@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">UniversityLibraryAssistance</string>
+    <string name="title_activity_librarian_custom_add">LibrarianCustomAddActivity</string>
 </resources>
