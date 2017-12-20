@@ -50,7 +50,8 @@
         <activity
             android:name=".LibrarianCustomAddActivity"
             android:label="@string/title_activity_librarian_custom_add"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".TestAssistanceActivity"></activity>
     </application>
 
 </manifest>
