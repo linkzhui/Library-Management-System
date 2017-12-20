@@ -29,8 +29,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -52,6 +54,7 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
     ListViewAdapter adapter;
     private int total_borrow_book_count = 0;
     private int check_box_count = 0;
+    private Button buttonRenew;
     final boolean[] found = new boolean[1];
     Date today = new Date();
 
@@ -84,6 +87,8 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
         buttonReturn.setOnClickListener(this);
         buttonSearch= findViewById(R.id.buttonSearch);
         buttonSearch.setOnClickListener(this);
+        buttonRenew = findViewById(R.id.buttonRenew);
+        buttonRenew.setOnClickListener(this);
         adapter = new ListViewAdapter(this);
         listView.setAdapter(adapter);
         ActionBar ab = getSupportActionBar();
@@ -138,7 +143,7 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
                             buttonBorrow.setVisibility(View.VISIBLE);
                             buttonReturn.setVisibility(View.VISIBLE);
                             buttonSearch.setVisibility(View.VISIBLE);
-
+                            buttonRenew.setVisibility(View.VISIBLE);
                         }
                     }
                     if(!found[0])
@@ -214,10 +219,89 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
                 BorrowedBookList.remove(element);
 
             }
+
             adapter.notifyDataSetChanged();
             mDatabase.child("Users").child(username).child("num_of_borrowed_book").setValue(null);
             mDatabase.child("Users").child(username).child("num_of_borrowed_book").setValue(total_borrow_book_count-return_book_count);
         }
+        else if(view.getId() == R.id.buttonRenew)
+        {
+            bookRenew();
+        }
+    }
+
+
+    private void bookRenew(){
+        Log.e("size",BorrowedBookList.size()+"");
+        // use mark_extend_books to update database
+        for(final book element:BorrowedBookList) {
+            mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    if (dataSnapshot.child("Users").child(username).child("bookList").hasChild(element.title) && dataSnapshot.child("Books").hasChild(element.title)) {
+                        Log.e("The book is founded", "!!!!!!!!!!!!!!!!");
+                        //add 30 days to old borrow day
+                        //String dueDateString = dataSnapshot.child("Users").child(username).child("bookList").child(element.title).child("DueDate").getValue(String.class);
+                        Integer numberofRenew = dataSnapshot.child("Users").child(username).child("bookList").child(element.title).child("NumberOfRenew").getValue(Integer.class);
+                        //int numberofRenew = Integer.parseInt(numberofRenewString);
+                        if (numberofRenew >= 2) {
+                            // make a toast
+                            makeToast("Exceed the Renew Limit");
+                        } else if (dataSnapshot.child("Books").child(element.title).hasChild("waiting_list")) {
+                            makeToast("Someone on WaitingList");
+                        } else {
+                            String oldDateString = dataSnapshot.child("Users").child(username).child("bookList").child(element.title).child("DueDate").getValue(String.class);
+                            Date oldDate = parsingDateString(oldDateString);
+                            Calendar c = Calendar.getInstance();
+                            c.setTime(oldDate);
+                            c.add(Calendar.DATE, 30);
+                            Date renewDate = c.getTime();
+                            DateFormat df = new SimpleDateFormat("MM/dd/yy");
+
+                            // update due date and time of renew in the database
+                            mDatabase.child("Users").child(username).child("bookList").child(element.title).child("DueDate").setValue(df.format(renewDate));
+                            mDatabase.child("Users").child(username).child("bookList").child(element.title).child("NumberOfRenew").setValue(numberofRenew + 1);
+
+                            //send email for renew confirmation
+                            String useremail = dataSnapshot.child("Users").child(username).child("email").getValue(String.class);
+                            String booktitle = element.title;
+                            String message = "You have succesfully extend book: " + booktitle;
+                            String subject = "Book Extension Confirmation";
+                            sendEmail(useremail, message, subject);
+                            makeToast("Extend Successful");
+                            element.date = df.format(renewDate);
+                            adapter.notifyDataSetChanged();
+                            /***
+                             if (dataSnapshot.child("Books").child(element.title).child("waiting_list").hasChild(element.title)) {
+
+                             }
+                             ***/
+
+
+                        }
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+
+
+            });
+            //BorrowedBookList.remove(element);
+            //adapter.notifyDataSetChanged();
+        }
+    }
+
+    public void makeToast(String messagetoToast){
+        Context context = getApplicationContext();
+        CharSequence text = messagetoToast;
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
     }
 
     private void sendEmail(String email, String message, String subject) {
@@ -252,7 +336,6 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
     //response to the menu item select
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
 
         switch(item.getItemId()){
             case android.R.id.home:
