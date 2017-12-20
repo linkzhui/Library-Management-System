@@ -1,10 +1,14 @@
 package com.example.raymon.universitylibraryassistance;
 
+import android.content.Intent;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -39,6 +43,7 @@ public class LibrarianSearchActivity extends AppCompatActivity implements View.O
     final Catalog[] cat = new Catalog[1];
     String title = "";
     final String TAG = "Librarian_Search";
+    private String book_title = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,6 +102,7 @@ public class LibrarianSearchActivity extends AppCompatActivity implements View.O
                                             cat[0] = new Catalog(author,title, call_number, publisher, year_of_publication, location_in_the_library, number_of_copies, current_status, keywords, coverage_image, isbn_thirteen, isbn_ten);
                                             //cat[0] = dataSnapshot.child(input).getValue(Catalog.class);
                                             setView(cat[0]);
+                                            book_title = title;
                                             break;
                                         }
                                         if (child.hasChild("isbn_ten") && child.child("isbn_ten").getValue(String.class).equals(input)) {
@@ -116,6 +122,7 @@ public class LibrarianSearchActivity extends AppCompatActivity implements View.O
                                             cat[0] = new Catalog(author,title, call_number, publisher, year_of_publication, location_in_the_library, number_of_copies, current_status, keywords, coverage_image, isbn_thirteen, isbn_ten);
                                             //cat[0] = dataSnapshot.child(input).getValue(Catalog.class);
                                             setView(cat[0]);
+                                            book_title = title;
                                             break;
                                         }
                                     }
@@ -154,7 +161,7 @@ public class LibrarianSearchActivity extends AppCompatActivity implements View.O
                                         String year_of_publication = dataSnapshot.child(input).child("year_of_publication").getValue(String.class);
                                         cat[0] = new Catalog(author,title, call_number, publisher, year_of_publication, location_in_the_library, number_of_copies, current_status, keywords, coverage_image, isbn_thirteen, isbn_ten);
                                         //cat[0] = dataSnapshot.child(input).getValue(Catalog.class);
-
+                                        book_title = title;
                                         setView(cat[0]);
                                     }
                                     else{
@@ -190,8 +197,9 @@ public class LibrarianSearchActivity extends AppCompatActivity implements View.O
         }
         else if(view.getId() == R.id.buttonDelete)
         {
+            Log.e("book title",book_title);
             //Toast.makeText(getApplicationContext(),"Delete button press",Toast.LENGTH_SHORT).show();
-            mDatabase.child("Books").addListenerForSingleValueEvent(new ValueEventListener() {
+            mDatabase.child("Books").child(book_title).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if(!dataSnapshot.child("current_status").getValue(String.class).equals("IDLE"))
@@ -220,6 +228,31 @@ public class LibrarianSearchActivity extends AppCompatActivity implements View.O
         }
     }
 
+    //create options menu
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.setting, menu);
+        return true;
+    }
+
+    //response to the menu item select
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+
+        switch(item.getItemId()){
+            case android.R.id.home:
+                finish();
+                break;
+            default:
+                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                System.out.print("hi");
+                startActivity(intent);
+                Toast.makeText(this, "Logout successful", Toast.LENGTH_SHORT).show();
+        }
+        return true;
+    }
     @Override
     public void onStart() {
         super.onStart();

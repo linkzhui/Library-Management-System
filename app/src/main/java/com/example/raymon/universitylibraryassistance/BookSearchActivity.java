@@ -9,6 +9,9 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -281,6 +284,32 @@ public class BookSearchActivity extends AppCompatActivity implements View.OnClic
         byte[] decodedString = Base64.decode(catlalog.getCoverage_image(), Base64.DEFAULT);
         Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
         image.setImageBitmap(decodedByte);
+    }
+
+    //create options menu
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.setting, menu);
+        return true;
+    }
+
+    //response to the menu item select
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+
+        switch(item.getItemId()){
+            case android.R.id.home:
+                finish();
+                break;
+            default:
+                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                System.out.print("hi");
+                startActivity(intent);
+                Toast.makeText(this, "Logout successful", Toast.LENGTH_SHORT).show();
+        }
+        return true;
     }
 
     private static boolean isISBN(String book) {

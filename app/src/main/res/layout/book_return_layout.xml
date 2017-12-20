@@ -7,15 +7,12 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5.0dip"
-        android:layout_marginLeft="12.599976dip"
-        android:layout_marginRight="12.599976dip"
         android:gravity="center_vertical">
 
         <LinearLayout
             android:id="@+id/linear_layout_up"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:orientation="horizontal" >
 
 
@@ -30,21 +27,33 @@
                 android:textColor="#ff323232"
                 android:textSize="16.0sp"
                 android:typeface="monospace" />
+
             <TextView
                 android:id="@+id/textViewBorrowDate"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
-                android:layout_weight="3"
+                android:layout_weight="2"
                 android:gravity="left|center"
                 android:paddingLeft="30dp"
-                android:text="Borrow Date"
+                android:text="Due Date"
                 android:textColor="#ff323232"
                 android:textSize="16.0sp"
                 android:typeface="monospace" />
+            <TextView
+                android:id = "@+id/textViewDue"
+                android:layout_height="50dp"
+                android:layout_width="0dp"
+                android:layout_weight="1.5"
+                android:text="Due!"
+                android:textColor="#ef042f"
+                android:textSize="16.0sp"
+                android:typeface="monospace"
+                android:visibility="invisible"
+            />
             <CheckBox
                 android:id="@+id/checkBox1"
                 android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:gravity="center"
                 android:layout_height="fill_parent"
                 android:focusable="false"

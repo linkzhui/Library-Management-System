@@ -12,6 +12,8 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -131,6 +133,31 @@ public class LibrarianAddActivity extends AppCompatActivity implements View.OnCl
         new LoadBookList().execute(editTextInput.getText().toString());
     }
 
+    //create options menu
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.setting, menu);
+        return true;
+    }
+
+    //response to the menu item select
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+
+        switch(item.getItemId()){
+            case android.R.id.home:
+                finish();
+                break;
+            default:
+                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                System.out.print("hi");
+                startActivity(intent);
+                Toast.makeText(this, "Logout successful", Toast.LENGTH_SHORT).show();
+        }
+        return true;
+    }
     private static class LoadBookList extends AsyncTask<String, Void, Void>
     {
 

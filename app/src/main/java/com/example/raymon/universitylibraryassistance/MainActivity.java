@@ -229,14 +229,18 @@ public class MainActivity extends AppCompatActivity {
     //response to the menu item select
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        mAuth.signOut();
-        updateUI(null);
-//        Toast.makeText(MainActivity.this,
-//                "Logout successful",
-//                Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-        startActivity(intent);
 
+
+        switch(item.getItemId()){
+            case android.R.id.home:
+                finish();
+                break;
+            default:
+                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                System.out.print("hi");
+                startActivity(intent);
+                Toast.makeText(this, "Logout successful", Toast.LENGTH_SHORT).show();
+        }
         return true;
     }
 

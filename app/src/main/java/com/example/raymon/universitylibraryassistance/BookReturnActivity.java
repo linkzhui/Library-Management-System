@@ -6,6 +6,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
@@ -45,7 +48,8 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
     private DatabaseReference mDatabase;
     String TAG = "BookReturnActivity";
     int total_borrow_book_count = 0;
-
+    Date today = new Date();
+    long new_date = today.getTime()+60*60*24*TestAssistanceActivity.offset[0];
 
 
     @Override
@@ -105,16 +109,14 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
 //                            mDatabase.child("Books").child(element.title).child("borrowed_by").setValue("NULL");
                             //need to check if the user need to pay the fee or not
                             String dueDateString = dataSnapshot.child("Users").child(username).child("bookList").child(element.title).child("DueDate").getValue(String.class);
-
-
                             Date dueDate = parsingDateString(dueDateString);
-                            Date today = new Date();
-                            if(dueDate.before(today)){
-                                long diff = today.getTime() - dueDate.getTime();
+
+                            if(dueDate.getTime()<new_date){
+                                long diff = new_date - dueDate.getTime();
                                 float days = (diff / (1000*60*60*24));
                                 Integer fine = (int)days + 1;
                                 makeToast("Fine: " + fine);
-                            }else{
+                            }
                                 mDatabase.child("Users").child(username).child("bookList").child(element.title).setValue(null);
                                 mDatabase.child("Books").child(element.title).child("current_status").setValue("IDLE");
                                 mDatabase.child("Books").child(element.title).child("borrowed_by").setValue("NULL");
@@ -122,7 +124,19 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
                                 String message = "You have succesfully return: " + element.title;
                                 String subject = "Book Return Confirmation";
                                 sendEmail(useremail,message,subject);
-                            }
+
+                                //if some one on the waiting list
+                                // send email remainder and put him out of the waitinglist
+                                if (dataSnapshot.child("Books").child(element.title).hasChild("waiting_list")) {
+                                    Iterable<DataSnapshot> waitingUsers = dataSnapshot.child("Books").child(element.title).child("waiting_list").getChildren();
+                                    String nextWaitingUser = waitingUsers.iterator().next().getKey();
+                                    String waitingUserEmail = dataSnapshot.child("Users").child(nextWaitingUser).child("email").getValue(String.class);
+                                    String waitingListSubject = "Your Book is Ready";
+                                    String waitingListMessage = "Your Book: " + element.title + " is Ready";
+                                    mDatabase.child("Books").child(element.title).child("waiting_list").child(nextWaitingUser).setValue(null);
+                                    sendEmail(waitingUserEmail, waitingListMessage, waitingListSubject);
+                                }
+
 
                         }
                     }
@@ -175,6 +189,8 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
                             if(numberofRenew >=2){
                                 // make a toast
                                 makeToast("Exceed the Renew Limit");
+                            }else if(dataSnapshot.child("Books").child(element.title).hasChild("waiting_list")){
+                                makeToast("Someone on WaitingList");
                             }else{
                                 String oldDateString = dataSnapshot.child("Users").child(username).child("bookList").child(element.title).child("DueDate").getValue(String.class);
                                 Date oldDate = parsingDateString(oldDateString);
@@ -221,6 +237,32 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
         }
 
 
+    }
+
+    //create options menu
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.setting, menu);
+        return true;
+    }
+
+    //response to the menu item select
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+
+        switch(item.getItemId()){
+            case android.R.id.home:
+                finish();
+                break;
+            default:
+                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                System.out.print("hi");
+                startActivity(intent);
+                Toast.makeText(this, "Logout successful", Toast.LENGTH_SHORT).show();
+        }
+        return true;
     }
 
     public void makeToast(String messagetoToast){
@@ -280,6 +322,7 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
             CheckBox cb;
             LinearLayout LL;
             TextView date;
+            TextView due;
         }
 
         public ListViewAdapter(Context context) {
@@ -294,7 +337,6 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
             mDatabase = FirebaseDatabase.getInstance().getReference();
             mDatabase.child("Users").child(username).child("bookList").addListenerForSingleValueEvent(new ValueEventListener(){
                 @Override
-
                 public void onDataChange(DataSnapshot snapshot) {
                     total_borrow_book_count=(int) snapshot.getChildrenCount();
                     for(DataSnapshot child:snapshot.getChildren())
@@ -303,7 +345,9 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
                         Log.e("key",child.getKey());
                         String value = snapshot.child(key).child("BorrowDate").getValue(String.class);
                         Log.e("value",value);
-                        book temp_book = new book(key,value);
+                        boolean due = parsingDateString(value).getTime()<new_date;
+                        book temp_book = new book(key,value,due);
+
                         BorrowedBookList.add(temp_book);
                         isSelected.put(key,false);
                     }
@@ -355,6 +399,7 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
                 holder.tvName = (TextView) convertView.findViewById(R.id.textViewBookTitle);
                 holder.LL = (LinearLayout) convertView.findViewById(R.id.linear_layout_up);
                 holder.date = (TextView) convertView.findViewById(R.id.textViewBorrowDate);
+                holder.due = (TextView) convertView.findViewById(R.id.textViewDue);
                 convertView.setTag(holder);
             } else {
                 // 取出holder
@@ -384,6 +429,10 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
             // 根据isSelected来设置checkbox的选中状况
             holder.cb.setChecked(getIsSelected().get(BorrowedBookList.get(position).title));
             holder.date.setText(date);
+//            if(BorrowedBookList.get(position).due)
+//            {
+//                holder.due.setVisibility(View.VISIBLE);
+//            }
             return convertView;
         }
 
@@ -396,10 +445,12 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
     class book{
         String title;
         String date;
-        public book(String title, String date)
+        Boolean due;
+        public book(String title, String date, Boolean due)
         {
             this.title = title;
             this.date = date;
+            this.due = due;
         }
     }
 }

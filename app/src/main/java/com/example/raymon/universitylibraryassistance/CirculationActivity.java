@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -26,6 +29,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,6 +53,10 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
     private int total_borrow_book_count = 0;
     private int check_box_count = 0;
     final boolean[] found = new boolean[1];
+    Date today = new Date();
+
+    long new_date = today.getTime()+1000*60*60*24*TestAssistanceActivity.offset[0];
+
     protected void onResume() {
 
         super.onResume();
@@ -59,6 +69,8 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
     }
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
+        Log.e("previous day",today.getTime()+"");
+        Log.e("offset day",new_date+"");
         super.onCreate(savedInstanceState);
         mDatabase = FirebaseDatabase.getInstance().getReference();
         setContentView(R.layout.activity_circulation);
@@ -77,6 +89,7 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
     }
+
 
     @Override
     public void onClick(View view) {
@@ -97,11 +110,29 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
                                 found[0] = true;
                                 String key = element.getKey();
                                 Log.e("key",element.getKey());
-                                String value = element.getValue(String.class);
+                                String value = element.child("DueDate").getValue(String.class);
                                 Log.e("value",value);
-                                book temp_book = new book(key,value);
+
+                                boolean due = parsingDateString(value).getTime()<new_date;
+                                long diff = parsingDateString(value).getTime() - new_date;
+                                if(parsingDateString(value).getTime()<new_date)
+                                {
+                                    String message = "You need to return " + key + "! it is already pass the due day! the due day is: "+parsingDateString(value);
+                                    String subject = "Warning! Book Return Pass the Due Day";
+                                    sendEmail(child.child("email").getValue(String.class),message,subject);
+                                }
+                                else if (1<=diff && diff<=5){
+                                    String message = "the book:" + key + " need to due in " + diff+ " day! the due day is: "+parsingDateString(value);
+                                    String subject = "Warning! Book Due Soon";
+                                    sendEmail(child.child("email").getValue(String.class),message,subject);
+                                }
+                                Log.e("boolean result",due+"");
+                                Log.e("current time",new_date+"");
+                                Log.e("due day",parsingDateString(value).getTime()+"");
+                                book temp_book = new book(key,value,due);
                                 BorrowedBookList.add(temp_book);
                                 isSelected.put(key,false);
+
                             }
                             adapter.notifyDataSetChanged();
                             buttonBorrow.setVisibility(View.VISIBLE);
@@ -189,6 +220,53 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
+    private void sendEmail(String email, String message, String subject) {
+        //Getting content for email
+        //Creating SendMail object
+        EmailReturnConfirmation sm = new EmailReturnConfirmation(this, email, subject, message);
+
+        //Executing sendmail to send email
+        sm.execute();
+    }
+
+    private Date parsingDateString(String dueDateString) {
+        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yy");
+        try {
+            Date dueDate = formatter.parse(dueDateString);
+            return dueDate;
+
+        } catch (ParseException e) {
+            System.err.println("Could not parse date: " + dueDateString);
+            return null;
+        }
+    }
+
+    //create options menu
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.setting, menu);
+        return true;
+    }
+
+    //response to the menu item select
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+
+        switch(item.getItemId()){
+            case android.R.id.home:
+                finish();
+                break;
+            default:
+                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                System.out.print("hi");
+                startActivity(intent);
+                Toast.makeText(this, "Logout successful", Toast.LENGTH_SHORT).show();
+        }
+        return true;
+    }
+
     private boolean checkEmail(){
         if(TextUtils.isEmpty(editTextAccount.getText()))
         {
@@ -213,6 +291,7 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
             CheckBox cb;
             LinearLayout LL;
             TextView date;
+            TextView due;
         }
 
         public ListViewAdapter(Context context) {
@@ -269,6 +348,8 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
             return position;
         }
 
+
+
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
             // TODO Auto-generated method stub
@@ -287,6 +368,7 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
                 holder.tvName =  convertView.findViewById(R.id.textViewBookTitle);
                 holder.LL =  convertView.findViewById(R.id.linear_layout_up);
                 holder.date = convertView.findViewById(R.id.textViewBorrowDate);
+                holder.due = (TextView) convertView.findViewById(R.id.textViewDue);
                 convertView.setTag(holder);
             } else {
                 // 取出holder
@@ -315,6 +397,10 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
             // 根据isSelected来设置checkbox的选中状况
             holder.cb.setChecked(getIsSelected().get(BorrowedBookList.get(position).title));
             holder.date.setText(date);
+//            if(BorrowedBookList.get(position).due)
+//            {
+//                holder.due.setVisibility(View.VISIBLE);
+//            }
             return convertView;
         }
 
@@ -322,15 +408,19 @@ public class CirculationActivity extends AppCompatActivity implements View.OnCli
             return isSelected;
         }
 
+
+
     }
 
     class book{
         String title;
         String date;
-        public book(String title, String date)
+        boolean due;
+        public book(String title, String date, boolean due)
         {
             this.title = title;
             this.date = date;
+            this.due = due;
         }
     }
 }
