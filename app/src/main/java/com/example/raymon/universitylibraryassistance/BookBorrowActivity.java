@@ -26,6 +26,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -113,7 +114,17 @@ public class BookBorrowActivity extends AppCompatActivity implements View.OnClic
                             // put username as key to set value
                             DateFormat df = new SimpleDateFormat("MM/dd/yy");
                             Date dateobj = new Date();
-                            mDatabase.child("Users").child(username).child("bookList").child(element.title).setValue(df.format(dateobj));
+                            Calendar c = Calendar.getInstance();
+                            c.setTime(dateobj);
+                            c.add(Calendar.DATE,30);
+                            Date dueDate = c.getTime();
+
+                            //add due date and the how many times user have borrowed the book
+                            //1. BorrowDate 2. DueDate 3. NumberOfBorrow
+                            mDatabase.child("Users").child(username).child("bookList").child(element.title).child("BorrowDate").setValue(df.format(dateobj));
+                            mDatabase.child("Users").child(username).child("bookList").child(element.title).child("DueDate").setValue(df.format(dueDate));
+                            mDatabase.child("Users").child(username).child("bookList").child(element.title).child("NumberOfRenew").setValue(0);
+                            // update database under books
                             mDatabase.child("Books").child(element.title).child("borrowed_by").setValue(username);
                             Log.i(TAG,"Store the book catalog into the database");
                             Map<String, Object> childUpdates = new HashMap<>();
@@ -163,13 +174,13 @@ public class BookBorrowActivity extends AppCompatActivity implements View.OnClic
 
         private void inital_data(){
             mDatabase.child("Users").child(username).child("book_list").addListenerForSingleValueEvent(new ValueEventListener(){
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                System.out.println(snapshot.getValue());  //prints "Do you have data? You'll love Firebase."
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    System.out.println(snapshot.getValue());  //prints "Do you have data? You'll love Firebase."
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
 
             });
         }

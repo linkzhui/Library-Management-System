@@ -21,6 +21,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,7 +39,7 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
     private Button buttonReturn;
     private int check_box_count = 0;
     ListViewAdapter adapter;
-
+    private Button buttonRenew;
     //user ID:
     String username;
     private DatabaseReference mDatabase;
@@ -52,7 +58,8 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
         book_list = findViewById(R.id.listViewBookReturn);
         buttonReturn = findViewById(R.id.buttonReturn);
         buttonReturn.setOnClickListener(this);
-
+        buttonRenew = findViewById(R.id.buttonRenew);
+        buttonRenew.setOnClickListener(this);
         adapter = new ListViewAdapter(this);
         book_list.setAdapter(adapter);
         adapter.notifyDataSetChanged();
@@ -62,6 +69,8 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
 
     @Override
     public void onClick(View view) {
+        if (view.getId() == R.id.buttonReturn)
+        {
             Toast.makeText(this,"Check out successful",Toast.LENGTH_SHORT).show();
             Log.e("size",BorrowedBookList.size()+"");
             final List<book> mark = new LinkedList<>();
@@ -80,7 +89,7 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
                 }
             }
             int return_book_count = mark.size();
-        
+
 
             //return email confirmation
             //
@@ -91,13 +100,29 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
 
                         if (dataSnapshot.child("Users").child(username).child("bookList").hasChild(element.title) && dataSnapshot.child("Books").hasChild(element.title)) {
                             Log.e("The book is founded","!!!!!!!!!!!!!!!!");
-                            mDatabase.child("Users").child(username).child("bookList").child(element.title).setValue(null);
-                            mDatabase.child("Books").child(element.title).child("current_status").setValue("IDLE");
-                            mDatabase.child("Books").child(element.title).child("borrowed_by").setValue("NULL");
+//                            mDatabase.child("Users").child(username).child("bookList").child(element.title).setValue(null);
+//                            mDatabase.child("Books").child(element.title).child("current_status").setValue("IDLE");
+//                            mDatabase.child("Books").child(element.title).child("borrowed_by").setValue("NULL");
                             //need to check if the user need to pay the fee or not
-                            String useremail = dataSnapshot.child("Users").child(username).child("email").getValue(String.class);
-                            String booktitle = element.title;
-                            sendEmail(useremail,booktitle);
+                            String dueDateString = dataSnapshot.child("Users").child(username).child("bookList").child(element.title).child("DueDate").getValue(String.class);
+
+
+                            Date dueDate = parsingDateString(dueDateString);
+                            Date today = new Date();
+                            if(dueDate.before(today)){
+                                long diff = today.getTime() - dueDate.getTime();
+                                float days = (diff / (1000*60*60*24));
+                                Integer fine = (int)days + 1;
+                                makeToast("Fine: " + fine);
+                            }else{
+                                mDatabase.child("Users").child(username).child("bookList").child(element.title).setValue(null);
+                                mDatabase.child("Books").child(element.title).child("current_status").setValue("IDLE");
+                                mDatabase.child("Books").child(element.title).child("borrowed_by").setValue("NULL");
+                                String useremail = dataSnapshot.child("Users").child(username).child("email").getValue(String.class);
+                                String message = "You have succesfully return: " + element.title;
+                                String subject = "Book Return Confirmation";
+                                sendEmail(useremail,message,subject);
+                            }
 
                         }
                     }
@@ -108,12 +133,124 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
 
                 });
                 BorrowedBookList.remove(element);
-            adapter.notifyDataSetChanged();
+                adapter.notifyDataSetChanged();
+            }
+
+
+            mDatabase.child("Users").child(username).child("num_of_borrowed_book").setValue(null);
+            mDatabase.child("Users").child(username).child("num_of_borrowed_book").setValue(total_borrow_book_count-return_book_count);
+        }
+        else{
+
+            Toast.makeText(this,"Extend Successful",Toast.LENGTH_SHORT).show();
+            Log.e("size",BorrowedBookList.size()+"");
+            // use mark_extend_books to update database
+            final List<book> mark_extend_books = new LinkedList<>();
+
+            for(book element:BorrowedBookList)
+            {
+
+                if (isSelected.get(element.title))
+                {
+                    //update the database
+                    isSelected.remove(element.title);
+                    //extend book add to List -> mark
+                    mark_extend_books.add(element);
+                    check_box_count--;
+                }
+            }
+            int extend_book_count = mark_extend_books.size();
+
+            for(final book element:mark_extend_books) {
+                mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        if (dataSnapshot.child("Users").child(username).child("bookList").hasChild(element.title) && dataSnapshot.child("Books").hasChild(element.title)) {
+                            Log.e("The book is founded", "!!!!!!!!!!!!!!!!");
+                            //add 30 days to old borrow day
+                            //String dueDateString = dataSnapshot.child("Users").child(username).child("bookList").child(element.title).child("DueDate").getValue(String.class);
+                            Integer numberofRenew = dataSnapshot.child("Users").child(username).child("bookList").child(element.title).child("NumberOfRenew").getValue(Integer.class);
+                            //int numberofRenew = Integer.parseInt(numberofRenewString);
+                            if(numberofRenew >=2){
+                                // make a toast
+                                makeToast("Exceed the Renew Limit");
+                            }else{
+                                String oldDateString = dataSnapshot.child("Users").child(username).child("bookList").child(element.title).child("DueDate").getValue(String.class);
+                                Date oldDate = parsingDateString(oldDateString);
+                                Calendar c = Calendar.getInstance();
+                                c.setTime(oldDate);
+                                c.add(Calendar.DATE,30);
+                                Date renewDate = c.getTime();
+                                DateFormat df = new SimpleDateFormat("MM/dd/yy");
+
+                                // update due date and time of renew in the database
+                                mDatabase.child("Users").child(username).child("bookList").child(element.title).child("DueDate").setValue(df.format(renewDate));
+                                mDatabase.child("Users").child(username).child("bookList").child(element.title).child("NumberOfRenew").setValue(numberofRenew + 1);
+
+                                //send email for renew confirmation
+                                String useremail = dataSnapshot.child("Users").child(username).child("email").getValue(String.class);
+                                String booktitle = element.title;
+                                String message = "You have succesfully extend book: " + booktitle;
+                                String subject = "Book Extension Confirmation";
+                                sendEmail(useremail,message,subject);
+                                /***
+                                 if (dataSnapshot.child("Books").child(element.title).child("waiting_list").hasChild(element.title)) {
+
+                                 }
+                                 ***/
+
+
+
+
+                            }
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+
+
+                });
+                //BorrowedBookList.remove(element);
+                //adapter.notifyDataSetChanged();
+
+            }
         }
 
-        mDatabase.child("Users").child(username).child("num_of_borrowed_book").setValue(null);
-        mDatabase.child("Users").child(username).child("num_of_borrowed_book").setValue(total_borrow_book_count-return_book_count);
 
+    }
+
+    public void makeToast(String messagetoToast){
+        Context context = getApplicationContext();
+        CharSequence text = messagetoToast;
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
+    }
+
+    private void sendEmail(String email, String message, String subject) {
+        //Getting content for email
+        //Creating SendMail object
+        EmailReturnConfirmation sm = new EmailReturnConfirmation(this, email, subject, message);
+
+        //Executing sendmail to send email
+        sm.execute();
+    }
+
+    private Date parsingDateString(String dueDateString) {
+        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yy");
+        try {
+            Date dueDate = formatter.parse(dueDateString);
+            return dueDate;
+
+        } catch (ParseException e) {
+            System.err.println("Could not parse date: " + dueDateString);
+            return null;
+        }
     }
 
     private void sendEmail(String email, String message) {
@@ -164,7 +301,7 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
                     {
                         String key = child.getKey();
                         Log.e("key",child.getKey());
-                        String value = child.getValue(String.class);
+                        String value = snapshot.child(key).child("BorrowDate").getValue(String.class);
                         Log.e("value",value);
                         book temp_book = new book(key,value);
                         BorrowedBookList.add(temp_book);
