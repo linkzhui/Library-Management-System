@@ -230,7 +230,6 @@ public class BookReturnActivity extends AppCompatActivity implements ViewStub.On
                              }
                              ***/
 
-
                         }
 
                     }

@@ -41,23 +41,20 @@
         android:id="@+id/buttonReturn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="36dp"
-        android:visibility="invisible"
-        android:layout_marginStart="39dp"
+        android:layout_marginEnd="91dp"
         android:text="Return"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/buttonBorrow"
-        app:layout_constraintTop_toTopOf="@+id/buttonBorrow" />
+        app:layout_constraintTop_toTopOf="@+id/buttonRenew" />
 
     <Button
         android:id="@+id/buttonBorrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="33dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginEnd="80dp"
         android:text="Check Out"
         android:visibility="invisible"
-        app:layout_constraintStart_toEndOf="@+id/buttonSearch"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ListViewBorrow" />
 
     <ListView
@@ -105,7 +102,7 @@
         android:id="@+id/buttonSearch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="39dp"
+        android:layout_marginStart="56dp"
         android:text="Search"
         android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
@@ -115,7 +112,8 @@
         android:id="@+id/buttonRenew"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="161dp"
+        android:layout_marginStart="56dp"
+        android:layout_marginTop="8dp"
         android:text="Renew"
         android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
